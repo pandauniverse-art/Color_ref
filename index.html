@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panda Universe Color Extractor</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #111111;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-sub: #888888;
+            --accent: #00ff88;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 배경 블러 효과 */
+        #ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #222, #000);
+            transition: background 1s ease;
+            opacity: 0.6;
+        }
+
+        header {
+            margin-top: 40px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1rem;
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            z-index: 10;
+            padding-bottom: 60px;
+        }
+
+        /* 입력 영역 */
+        .input-area {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .drop-zone {
+            flex: 2;
+            min-width: 300px;
+            height: 300px;
+            border: 2px dashed #444;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .drop-zone img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .url-input-box {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: var(--text-main);
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:active { transform: scale(0.98); }
+
+        /* 색상 결과 영역 (3D Spheres) */
+        .palette-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            padding: 40px 0;
+            perspective: 1000px;
+        }
+
+        .color-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* 3D 구슬 스타일링 핵심 CSS */
+        .sphere {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease;
+            /* 기본 그림자 */
+            box-shadow: 
+                inset 10px 10px 20px rgba(255,255,255,0.2), /* 하이라이트 */
+                inset -10px -10px 20px rgba(0,0,0,0.4), /* 음영 */
+                0 15px 30px rgba(0,0,0,0.4); /* 바닥 그림자 */
+        }
+
+        .sphere::after {
+            content: '';
+            position: absolute;
+            top: 15%; left: 15%;
+            width: 25%; height: 25%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0));
+            filter: blur(2px);
+        }
+
+        .sphere:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .hex-code {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .hex-code:hover { color: white; }
+
+        /* 외부 링크 버튼 */
+        .ref-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            opacity: 0; 
+            transition: opacity 0.5s;
+        }
+        
+        .ref-links.visible { opacity: 1; }
+
+        .ref-btn {
+            background: #333;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .ref-btn:hover { background: #555; }
+        .ref-btn span { font-size: 1.2rem; }
+
+        /* 유틸리티 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,255,136,0.9);
+            color: black;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .toast.show { opacity: 1; }
+
+        @keyframes popUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .palette-container { gap: 15px; }
+            .sphere { width: 70px; height: 70px; }
+            .container { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ambient-bg"></div>
+
+    <header>
+        <h1>Mood Sphere</h1>
+        <p class="subtitle">Extract 3D Colors from your Inspiration</p>
+    </header>
+
+    <div class="container">
+        <div class="input-area">
+            <div class="drop-zone" id="dropZone">
+                <span style="color:#666; pointer-events: none;">Drag & Drop Image Here<br>or Click to Upload</span>
+                <img id="previewImg" alt="Preview" crossorigin="anonymous">
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+            
+            <div class="url-input-box">
+                <p style="color:#888; font-size:0.9rem;">Or paste an image URL</p>
+                <input type="text" id="urlInput" placeholder="https://example.com/image.jpg">
+                <button class="btn" onclick="loadImageFromUrl()">Extract Colors</button>
+            </div>
+        </div>
+
+        <div id="paletteArea" class="palette-container">
+            </div>
+
+        <div id="refLinks" class="ref-links">
+            <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> Pinterest Search</a>
+            <a href="#" target="_blank" id="btnBehance" class="ref-btn"><span>B̄</span> Behance Search</a>
+            <a href="#" target="_blank" id="btnGoogle" class="ref-btn"><span>G</span> Google Images</a>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Copied!</div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewImg = document.getElementById('previewImg');
+        const paletteArea = document.getElementById('paletteArea');
+        const ambientBg = document.getElementById('ambient-bg');
+        const urlInput = document.getElementById('urlInput');
+        const colorThief = new ColorThief();
+
+        // 1. 드래그 앤 드롭 이벤트
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) processFile(e.target.files[0]);
+        });
+
+        // 2. 파일 처리 및 이미지 로드
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                dropZone.querySelector('span').style.display = 'none';
+                
+                // 이미지 로드 완료 후 색상 추출
+                previewImg.onload = () => extractAndRenderColors();
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // 3. URL 처리 (CORS 문제 주의)
+        function loadImageFromUrl() {
+            const url = urlInput.value;
+            if(!url) return;
+            
+            previewImg.crossOrigin = "Anonymous"; // CORS 시도
+            previewImg.src = url;
+            previewImg.style.display = 'block';
+            dropZone.querySelector('span').style.display = 'none';
+
+            previewImg.onload = () => extractAndRenderColors();
+            previewImg.onerror = () => {
+                alert("이미지를 불러올 수 없습니다. (CORS 보안 문제일 수 있습니다. 이미지를 다운로드해서 업로드해보세요!)");
+            }
+        }
+
+        // 4. 색상 추출 및 렌더링 (핵심 로직)
+        function extractAndRenderColors() {
+            try {
+                // Color Thief로 상위 5개 색상 추출
+                const colors = colorThief.getPalette(previewImg, 5);
+                
+                // 1. 배경 분위기 변경 (가장 지배적인 색상으로)
+                const mainColor = colors[0];
+                ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${mainColor[0]},${mainColor[1]},${mainColor[2]}), #000)`;
+
+                // 2. 구슬 초기화 및 생성
+                paletteArea.innerHTML = '';
+                
+                // 검색용 헥스 코드 배열
+                const hexArray = [];
+
+                colors.forEach((color, index) => {
+                    const hex = rgbToHex(color[0], color[1], color[2]);
+                    hexArray.push(hex);
+
+                    // HTML 요소 생성
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'color-item';
+                    wrapper.style.animationDelay = `${index * 0.1}s`; // 순차적 등장
+
+                    // 3D 구슬 (CSS Gradient로 입체감 표현)
+                    const sphere = document.createElement('div');
+                    sphere.className = 'sphere';
+                    sphere.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+                    
+                    // 클릭 시 복사
+                    sphere.onclick = () => copyToClipboard(hex);
+
+                    // 텍스트
+                    const text = document.createElement('span');
+                    text.className = 'hex-code';
+                    text.innerText = hex;
+                    text.onclick = () => copyToClipboard(hex);
+
+                    wrapper.appendChild(sphere);
+                    wrapper.appendChild(text);
+                    paletteArea.appendChild(wrapper);
+                });
+
+                // 3. 외부 링크 업데이트
+                updateRefLinks(hexArray);
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // 5. 외부 레퍼런스 링크 생성기
+        function updateRefLinks(hexList) {
+            const refContainer = document.getElementById('refLinks');
+            const pinterestBtn = document.getElementById('btnPinterest');
+            const behanceBtn = document.getElementById('btnBehance');
+            const googleBtn = document.getElementById('btnGoogle');
+
+            // 주요 색상 2~3개를 조합해서 검색어 생성
+            const queryColor = `${hexList[0]} ${hexList[1]}`; 
+            
+            // Pinterest: 색상 팔레트 검색
+            pinterestBtn.href = `https://www.pinterest.co.kr/search/pins/?q=color palette ${queryColor.replace(/#/g, '')}`;
+            
+            // Behance: 해당 컬러 무드 검색
+            behanceBtn.href = `https://www.behance.net/search/projects?search=color palette ${hexList[0].replace(/#/g, '')}`;
+
+            // Google Images: 색상 조합 검색
+            googleBtn.href = `https://www.google.com/search?tbm=isch&q=color palette ${queryColor}`;
+
+            refContainer.classList.add('visible');
+        }
+
+        // 유틸: RGB -> Hex 변환
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        // 유틸: 클립보드 복사
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.innerText = `${text} Copied!`;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+        }
+    </script>
+</body>
+</html>
