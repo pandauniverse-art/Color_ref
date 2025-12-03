@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panda Universe Color Extractor</title>
+    <title>Panda Universe Color Extractor (FIXED)</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     
@@ -16,6 +16,8 @@
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.15);
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Pretendard', sans-serif;
@@ -31,93 +33,65 @@
         }
 
         #ambient-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #222, #000);
-            transition: background 1s ease;
-            opacity: 0.6;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #222, #000); opacity: 0.6; transition: background 1s ease;
         }
 
         header {
-            margin-top: 30px; /* 여백 축소 */
-            text-align: center;
-            z-index: 10;
-            position: relative;
-            width: 90%;
-            max-width: 800px; /* 폭 축소 */
+            margin-top: 30px; text-align: center; z-index: 10; position: relative; width: 90%; max-width: 800px;
         }
 
         h1 {
-            font-size: 2rem; /* 폰트 축소 */
-            margin-bottom: 5px;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, #999);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-top: 0;
+            font-size: 2rem; margin-bottom: 5px; font-weight: 800;
+            background: linear-gradient(to right, #fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0;
         }
         
         .subtitle { font-size: 0.9rem; color: var(--text-sub); }
 
-        .lang-switch {
-            position: absolute; top: 0; right: 0; display: flex; gap: 5px;
-        }
-
-        .lang-btn {
-            background: var(--glass); color: var(--text-sub); border: 1px solid var(--border);
-            padding: 4px 10px; border-radius: 15px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;
-        }
-        .lang-btn:hover, .lang-btn.active {
-            background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent);
-        }
-
         .guide-box {
             display: flex; gap: 15px; background: var(--glass); padding: 10px 20px;
             border-radius: 40px; margin-top: 15px; border: 1px solid var(--border);
-            backdrop-filter: blur(10px); justify-content: center; flex-wrap: wrap;
+            justify-content: center; flex-wrap: wrap; font-size: 0.8rem; color: #ccc;
         }
-        .guide-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #ccc; }
         .guide-icon {
             background: rgba(255,255,255,0.1); width: 20px; height: 20px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold;
+            display: inline-flex; align-items: center; justify-content: center; margin-right: 5px; font-weight: bold;
         }
 
         .container {
-            width: 90%; max-width: 800px; /* 전체 폭 축소 */
-            margin-top: 30px; display: flex; flex-direction: column; gap: 25px; /* 간격 축소 */
-            z-index: 10; padding-bottom: 50px;
+            width: 90%; max-width: 800px; margin-top: 30px; display: flex; flex-direction: column; gap: 25px; z-index: 10; padding-bottom: 50px;
         }
 
         .input-area { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
 
+        /* 드롭존 스타일 */
         .drop-zone {
-            flex: 2; min-width: 250px; height: 280px; /* 높이 축소 */
+            flex: 2; min-width: 250px; height: 250px;
             border: 2px dashed #444; border-radius: 15px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease;
-            background: rgba(255,255,255,0.02); overflow: hidden; position: relative; outline: none;
+            align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
+            background: rgba(255,255,255,0.02); overflow: hidden; position: relative;
         }
-        .drop-zone:hover, .drop-zone.active { border-color: var(--accent); background: rgba(0, 255, 136, 0.05); }
+        .drop-zone.active { border-color: var(--accent); background: rgba(0, 255, 136, 0.1); transform: scale(1.02); }
         .drop-zone img { max-width: 100%; max-height: 100%; object-fit: contain; display: none; z-index: 2; }
         .drop-msg { text-align: center; color: #666; pointer-events: none; line-height: 1.5; z-index: 1; font-size: 0.9rem; }
         .highlight-text { color: var(--accent); font-weight: bold; font-size: 1rem; }
 
         .url-input-box { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
         input[type="text"] {
-            padding: 12px; border-radius: 10px; border: 1px solid #444; background: #222; color: white; font-size: 0.9rem; outline: none;
+            padding: 12px; border-radius: 10px; border: 1px solid #444; background: #222; color: white; font-size: 0.9rem; outline: none; width: 100%;
         }
         input[type="text"]:focus { border-color: var(--accent); }
         .btn {
-            padding: 12px; border-radius: 10px; border: none; background: var(--text-main); color: black; font-weight: bold; cursor: pointer; font-size: 0.9rem;
+            padding: 12px; border-radius: 10px; border: none; background: var(--text-main); color: black; font-weight: bold; cursor: pointer; font-size: 0.9rem; width: 100%;
         }
 
-        /* [UPDATED] 분석 카드 (Compact + Insight) */
+        /* 분석 카드 */
         .analysis-card {
             background: var(--glass); border: 1px solid var(--border); border-radius: 15px;
             padding: 20px; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
-            backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 15px;
+            backdrop-filter: blur(10px); display: none; flex-direction: column; gap: 15px;
         }
-        .analysis-card.visible { opacity: 1; transform: translateY(0); }
+        .analysis-card.visible { opacity: 1; transform: translateY(0); display: flex; }
         
         .stats-row { display: flex; justify-content: space-between; gap: 20px; width: 100%; }
         .stat-item { flex: 1; text-align: left; }
@@ -126,23 +100,17 @@
         .stat-bar { width: 100%; height: 3px; background: #333; border-radius: 2px; margin-top: 6px; overflow: hidden; }
         .stat-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
 
-        /* 디자인 이론 멘트 영역 */
-        .insight-box {
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 15px;
-            margin-top: 5px;
-        }
+        .insight-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px; }
         .insight-title { font-size: 0.8rem; color: var(--accent); font-weight: bold; margin-bottom: 5px; display: block;}
         .insight-text { font-size: 0.9rem; line-height: 1.5; color: #ddd; word-break: keep-all; }
 
-        /* [UPDATED] 구슬 사이즈 축소 (2/3) */
+        /* 컬러 팔레트 */
         .palette-container {
             display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 10px 0; perspective: 1000px; min-height: 100px;
         }
         .color-item { display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; transform: translateY(20px); animation: popUp 0.6s forwards; }
         .sphere {
-            width: 60px; height: 60px; /* 90px -> 60px 축소 */
-            border-radius: 50%; cursor: pointer; position: relative; transition: transform 0.3s ease;
+            width: 60px; height: 60px; border-radius: 50%; cursor: pointer; position: relative; transition: transform 0.3s ease;
             box-shadow: inset 6px 6px 12px rgba(255,255,255,0.2), inset -6px -6px 12px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.4);
         }
         .sphere::after {
@@ -154,7 +122,7 @@
         .hex-code { font-family: monospace; font-size: 0.85rem; color: #fff; cursor: pointer; }
         .percent-text { font-size: 0.75rem; color: var(--text-sub); }
 
-        .ref-links { display: flex; justify-content: center; gap: 10px; margin-top: 10px; opacity: 0; transition: opacity 0.5s; }
+        .ref-links { display: flex; justify-content: center; gap: 10px; margin-top: 10px; opacity: 0; transition: opacity 0.5s; flex-wrap: wrap;}
         .ref-links.visible { opacity: 1; }
         .ref-btn {
             background: #333; color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; transition: background 0.3s;
@@ -164,18 +132,11 @@
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: var(--accent); color: black; padding: 8px 20px; border-radius: 30px; font-weight: bold; font-size: 0.9rem;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000;
         }
         .toast.show { opacity: 1; }
 
         @keyframes popUp { to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 768px) {
-            .stats-row { flex-direction: column; gap: 15px; }
-            .sphere { width: 50px; height: 50px; }
-            .container { width: 95%; }
-            .analysis-card { text-align: left; }
-        }
     </style>
 </head>
 <body>
@@ -183,485 +144,415 @@
     <div id="ambient-bg"></div>
 
     <header>
-        <div class="lang-switch">
-            <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-            <button class="lang-btn" onclick="setLanguage('ko')">KR</button>
-            <button class="lang-btn" onclick="setLanguage('jp')">JP</button>
-        </div>
-        <h1 data-i18n="title">Mood Sphere</h1>
-        <p class="subtitle" data-i18n="subtitle">Design Theory & Color Analysis</p>
+        <h1>Mood Sphere</h1>
+        <p class="subtitle">Design Theory & Color Analysis</p>
         
         <div class="guide-box">
-            <div class="guide-item">
-                <div class="guide-icon">V</div>
-                <span data-i18n="guide-paste"><strong>Ctrl+V</strong> to Paste</span>
-            </div>
-            <div class="guide-item">
-                <div class="guide-icon">D</div>
-                <span data-i18n="guide-drag"><strong>Drag</strong> File</span>
-            </div>
-            <div class="guide-item">
-                <div class="guide-icon">U</div>
-                <span data-i18n="guide-url"><strong>URL</strong> Link</span>
-            </div>
+            <span><span class="guide-icon">V</span>Ctrl+V Paste</span>
+            <span><span class="guide-icon">D</span>Drag & Drop</span>
+            <span><span class="guide-icon">U</span>URL Link</span>
         </div>
     </header>
 
     <div class="container">
         <div class="input-area">
-            <div class="drop-zone" id="dropZone" tabindex="0">
+            <div class="drop-zone" id="dropZone">
                 <div class="drop-msg">
-                    <span class="highlight-text" data-i18n="drop-highlight">Ctrl + V</span>
-                    <span data-i18n="drop-main">to Paste Image</span><br>
-                    <span style="font-size:0.85rem; margin-top:8px; display:block;" data-i18n="drop-sub">Drag & Drop / Click to Upload</span>
+                    <span class="highlight-text">Ctrl + V</span> to Paste<br>
+                    Drag & Drop / Click
                 </div>
                 <img id="previewImg" alt="Preview" crossorigin="anonymous">
                 <input type="file" id="fileInput" accept="image/*" style="display: none;">
             </div>
             
             <div class="url-input-box">
-                <p style="color:#888; font-size:0.8rem;" data-i18n="url-label">Or paste image URL</p>
+                <p style="color:#888; font-size:0.8rem; margin:0;">Or paste URL</p>
                 <input type="text" id="urlInput" placeholder="https://example.com/image.jpg">
-                <button class="btn" onclick="loadImageFromUrl()" data-i18n="url-btn">Analyze</button>
+                <button class="btn" id="analyzeBtn">Analyze</button>
             </div>
         </div>
 
         <div id="analysisCard" class="analysis-card">
             <div class="stats-row">
                 <div class="stat-item">
-                    <span class="stat-label" data-i18n="stat-contrast">Contrast Level</span>
+                    <span class="stat-label">Contrast</span>
                     <span class="stat-value" id="val-contrast">-</span>
                     <div class="stat-bar"><div class="stat-fill" id="bar-contrast"></div></div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label" data-i18n="stat-saturation">Vibrancy</span>
+                    <span class="stat-label">Vibrancy</span>
                     <span class="stat-value" id="val-saturation">-</span>
                     <div class="stat-bar"><div class="stat-fill" id="bar-saturation"></div></div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label" data-i18n="stat-temp">Color Temp</span>
+                    <span class="stat-label">Temp</span>
                     <span class="stat-value" id="val-temp">-</span>
                     <div class="stat-bar"><div class="stat-fill" id="bar-temp" style="background: linear-gradient(90deg, #4facfe 0%, #ff6b6b 100%);"></div></div>
                 </div>
             </div>
             <div class="insight-box">
-                <span class="insight-title" data-i18n="insight-header">DESIGN INSIGHT</span>
-                <p class="insight-text" id="design-insight">Upload an image to get professional design analysis.</p>
+                <span class="insight-title">DESIGN INSIGHT</span>
+                <p class="insight-text" id="design-insight">Loading insight...</p>
             </div>
         </div>
 
         <div id="paletteArea" class="palette-container"></div>
 
         <div id="refLinks" class="ref-links">
-            <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> <span data-i18n="ref-pinterest">Pinterest</span></a>
-            <a href="#" target="_blank" id="btnBehance" class="ref-btn"><span>B̄</span> <span data-i18n="ref-behance">Behance</span></a>
-            <a href="#" target="_blank" id="btnGoogle" class="ref-btn"><span>G</span> <span data-i18n="ref-google">Google</span></a>
+            <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> Pinterest</a>
+            <a href="#" target="_blank" id="btnBehance" class="ref-btn"><span>B̄</span> Behance</a>
+            <a href="#" target="_blank" id="btnGoogle" class="ref-btn"><span>G</span> Google</a>
         </div>
     </div>
 
-    <div id="toast" class="toast" data-i18n="toast-copied">Copied!</div>
+    <div id="toast" class="toast">Copied!</div>
 
     <script>
+        // ==========================================
+        // 1. 핵심 요소 선택 및 초기화
+        // ==========================================
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const previewImg = document.getElementById('previewImg');
         const paletteArea = document.getElementById('paletteArea');
         const ambientBg = document.getElementById('ambient-bg');
         const urlInput = document.getElementById('urlInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
         const dropMsg = document.querySelector('.drop-msg');
         const analysisCard = document.getElementById('analysisCard');
-        const colorThief = new ColorThief();
-
-        // 번역 데이터 (인사이트 문구용 템플릿 포함)
-        const translations = {
-            en: {
-                title: "Mood Sphere",
-                subtitle: "Design Theory & Color Analysis",
-                "guide-paste": "<strong>Ctrl+V</strong> to Paste",
-                "guide-drag": "<strong>Drag</strong> File",
-                "guide-url": "<strong>URL</strong> Link",
-                "drop-highlight": "Ctrl + V",
-                "drop-main": " to Paste Image",
-                "drop-sub": "Drag & Drop / Click to Upload",
-                "url-label": "Or paste image URL",
-                "url-btn": "Analyze",
-                "url-placeholder": "https://example.com/image.jpg",
-                "stat-contrast": "Contrast",
-                "stat-saturation": "Vibrancy",
-                "stat-temp": "Temperature",
-                "insight-header": "DESIGN INSIGHT",
-                "ref-pinterest": "Pinterest", "ref-behance": "Behance", "ref-google": "Google",
-                "toast-copied": "Copied!",
-                "loading": "Analyzing...",
-                // Values
-                "val-high": "High", "val-med": "Medium", "val-low": "Low",
-                "val-vivid": "Vivid", "val-muted": "Muted",
-                "val-warm": "Warm", "val-cool": "Cool", "val-neutral": "Neutral",
-                // Insight Templates
-                "insight-template": "This palette features {contrast} contrast with a dominant {temp} tone. The {sat} saturation suggests a {mood} atmosphere, making it suitable for {usage}."
-            },
-            ko: {
-                title: "무드 스피어",
-                subtitle: "디자인 이론 기반 컬러 분석",
-                "guide-paste": "<strong>Ctrl+V</strong> 붙여넣기",
-                "guide-drag": "<strong>드래그</strong> 업로드",
-                "guide-url": "<strong>URL</strong> 주소",
-                "drop-highlight": "Ctrl + V",
-                "drop-main": " 로 이미지 붙여넣기",
-                "drop-sub": "드래그 또는 클릭하여 업로드",
-                "url-label": "또는 이미지 URL 입력",
-                "url-btn": "분석하기",
-                "url-placeholder": "https://예시.com/이미지.jpg",
-                "stat-contrast": "대비 (Contrast)",
-                "stat-saturation": "채도 (Vibrancy)",
-                "stat-temp": "온도 (Temp)",
-                "insight-header": "디자인 인사이트",
-                "ref-pinterest": "핀터레스트", "ref-behance": "비핸스", "ref-google": "구글",
-                "toast-copied": "복사 완료!",
-                "loading": "분석 중...",
-                // Values
-                "val-high": "높음 (High)", "val-med": "중간 (Med)", "val-low": "낮음 (Low)",
-                "val-vivid": "선명함", "val-muted": "차분함",
-                "val-warm": "따뜻함", "val-cool": "차가움", "val-neutral": "중성적",
-                // Insight Templates
-                "insight-template": "이 팔레트는 {contrast} 대비와 {temp} 계열의 톤이 주를 이룹니다. {sat} 채도로 구성되어 {mood} 분위기를 자아내며, {usage} 디자인에 적합합니다."
-            },
-            jp: {
-                title: "ムードスフィア",
-                subtitle: "デザイン理論に基づくカラー分析",
-                "guide-paste": "<strong>Ctrl+V</strong> 貼り付け",
-                "guide-drag": "<strong>ドラッグ</strong> アップロード",
-                "guide-url": "<strong>URL</strong> リンク",
-                "drop-highlight": "Ctrl + V",
-                "drop-main": " で貼り付け",
-                "drop-sub": "ドラッグまたはクリック",
-                "url-label": "または画像のURL",
-                "url-btn": "分析する",
-                "url-placeholder": "https://例.com/画像.jpg",
-                "stat-contrast": "コントラスト",
-                "stat-saturation": "鮮やかさ",
-                "stat-temp": "色温度",
-                "insight-header": "デザインインサイト",
-                "ref-pinterest": "Pinterest", "ref-behance": "Behance", "ref-google": "Google",
-                "toast-copied": "コピー完了!",
-                "loading": "分析中...",
-                // Values
-                "val-high": "高い", "val-med": "普通", "val-low": "低い",
-                "val-vivid": "鮮やか", "val-muted": "落ち着いた",
-                "val-warm": "暖かい", "val-cool": "冷たい", "val-neutral": "中性",
-                // Insight Templates
-                "insight-template": "このパレットは{contrast}コントラストと{temp}トーンが特徴です。{sat}彩度で構成され、{mood}雰囲気を持ち、{usage}に適しています。"
+        const toast = document.getElementById('toast');
+        
+        let colorThief;
+        
+        // 라이브러리 로드 체크
+        window.onload = () => {
+            if (typeof ColorThief !== 'undefined') {
+                colorThief = new ColorThief();
+            } else {
+                alert("ColorThief 라이브러리 로드 실패. 새로고침 해주세요.");
             }
         };
 
-        let currentLang = 'en';
-        let currentAnalysisData = null; // 분석 데이터 저장용
+        // ==========================================
+        // 2. 이벤트 리스너 (강제 납치 모드)
+        // ==========================================
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if(translations[lang][key]) el.innerHTML = translations[lang][key];
-            });
-            document.getElementById('urlInput').placeholder = translations[lang]['url-placeholder'];
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // 언어 변경 시 인사이트 텍스트도 재생성
-            if(currentAnalysisData) generateDesignInsight(currentAnalysisData);
-        }
+        // [Global Drag & Drop Override]
+        // 브라우저가 이미지를 새 탭에서 여는 기본 동작을 '화면 전체'에서 방지합니다.
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault(); // 필수: 이걸 안 하면 드롭 시 파일이 열려버림
+            dropZone.classList.add('active');
+        });
 
-        // [CRITICAL FIX] 윈도우 전체에 Paste 이벤트 리스너 부착
+        window.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            // 마우스가 화면 밖으로 나갔을 때만 active 해제 (간단히 처리)
+            if (e.clientX === 0 && e.clientY === 0) {
+                dropZone.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // [Global Paste Override]
+        // 화면 어디서든 Ctrl+V를 누르면 이미지가 있는지 검사합니다.
         window.addEventListener('paste', (e) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             let blob = null;
 
+            // 클립보드 아이템 중 이미지 찾기
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
                     blob = items[i].getAsFile();
-                    e.preventDefault(); // 텍스트 붙여넣기 동작 등 차단
                     break;
                 }
             }
 
             if (blob) {
+                // 이미지가 발견되면 텍스트 붙여넣기 등을 막고 이미지 처리
+                e.preventDefault(); 
                 processFile(blob);
-                dropZone.classList.add('active');
-                setTimeout(() => dropZone.classList.remove('active'), 200);
+                showToast("Image Pasted!");
             }
         });
 
+        // [Click Upload]
         dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('active'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active');
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault(); dropZone.classList.remove('active');
-            if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
-        });
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) processFile(e.target.files[0]);
+            if (e.target.files && e.target.files.length > 0) {
+                processFile(e.target.files[0]);
+            }
         });
 
+        // https://techcommunity.microsoft.com/discussions/excelgeneral/analysis-button/4365978
+        analyzeBtn.addEventListener('click', loadImageFromUrl);
+        // URL 입력창에서 엔터 쳐도 실행
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadImageFromUrl();
+        });
+
+        // ==========================================
+        // 3. 파일 및 이미지 처리 로직
+        // ==========================================
+
         function processFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert("이미지 파일만 가능합니다.");
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
+                // 이미지 로드 완료 이벤트
                 previewImg.onload = () => {
                     previewImg.style.display = 'block';
                     dropMsg.style.display = 'none';
-                    extractAndRenderColors();
+                    runAnalysis(); // 분석 시작
                 };
-            }
+            };
             reader.readAsDataURL(file);
         }
 
         function loadImageFromUrl() {
-            let url = urlInput.value.trim();
-            if(!url) return;
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            analyzeBtn.innerText = "Loading...";
             
+            // 고속 프록시 사용
             const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=500&output=jpg`;
+            
             previewImg.crossOrigin = "Anonymous";
             previewImg.src = proxyUrl;
-            
-            const btn = document.querySelector('.url-input-box .btn');
-            const originalBtnText = btn.innerText;
-            btn.innerText = translations[currentLang]['loading'];
-            
+
             previewImg.onload = () => {
                 previewImg.style.display = 'block';
                 dropMsg.style.display = 'none';
-                extractAndRenderColors();
-                btn.innerText = originalBtnText;
+                analyzeBtn.innerText = "Analyze";
+                runAnalysis();
             };
+
             previewImg.onerror = () => {
-                btn.innerText = originalBtnText;
-                alert("Image Load Failed. Try Ctrl+V!");
-                dropMsg.style.display = 'block';
+                analyzeBtn.innerText = "Analyze";
+                alert("이미지 로드 실패. 링크 보안 문제일 수 있습니다. Ctrl+V 기능을 사용해보세요.");
                 previewImg.style.display = 'none';
+                dropMsg.style.display = 'block';
             };
         }
 
-        function extractAndRenderColors() {
+        // ==========================================
+        // 4. 분석 및 렌더링 (핵심 기능)
+        // ==========================================
+
+        function runAnalysis() {
+            if (!colorThief) return;
+
             try {
-                const paletteSize = 8;
-                let colors = colorThief.getPalette(previewImg, paletteSize, 10);
-                if (!colors) return;
+                // 1. 팔레트 추출 (8개)
+                const palette = colorThief.getPalette(previewImg, 8, 10);
+                if (!palette) return;
 
-                // 픽셀 데이터 분석
-                const pixelData = getPixelData(previewImg);
-                const colorCounts = pixelData.counts;
+                // 2. 픽셀 데이터 상세 분석 (비율 및 이론 계산용)
+                const pixelStats = analyzePixels(previewImg);
+                const colorCounts = pixelStats.counts;
+                const top5Colors = getTop5Colors(palette, colorCounts);
 
-                // 색상 정렬 (많이 쓰인 순)
-                const rankedColors = colors.map((color) => {
-                    const count = calculateColorCount(color, colorCounts);
-                    return { color, count, hex: rgbToHex(color[0], color[1], color[2]) };
-                })
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 5); // Top 5
+                // 3. UI 업데이트: 배경
+                const main = top5Colors[0].color;
+                ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${main[0]},${main[1]},${main[2]}), #000)`;
 
-                // 디자인 이론 분석 실행
-                analyzeDesignTheory(rankedColors);
+                // 4. UI 업데이트: 구슬 (Palette)
+                renderPalette(top5Colors);
 
-                // UI 렌더링
-                const totalTop5Count = rankedColors.reduce((sum, item) => sum + item.count, 0);
-                const mainColor = rankedColors[0].color;
-                ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${mainColor[0]},${mainColor[1]},${mainColor[2]}), #000)`;
+                // 5. UI 업데이트: 분석 리포트 & 인사이트
+                renderReport(top5Colors, pixelStats);
 
-                paletteArea.innerHTML = '';
-                const hexArray = [];
-
-                rankedColors.forEach((item, index) => {
-                    hexArray.push(item.hex);
-                    const percent = totalTop5Count > 0 ? ((item.count / totalTop5Count) * 100).toFixed(1) : 0;
-
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'color-item';
-                    wrapper.style.animationDelay = `${index * 0.1}s`;
-
-                    const sphere = document.createElement('div');
-                    sphere.className = 'sphere';
-                    sphere.style.backgroundColor = `rgb(${item.color[0]}, ${item.color[1]}, ${item.color[2]})`;
-                    sphere.onclick = () => copyToClipboard(item.hex);
-
-                    const infoBox = document.createElement('div');
-                    infoBox.className = 'color-info';
-                    
-                    const hexText = document.createElement('span');
-                    hexText.className = 'hex-code';
-                    hexText.innerText = item.hex;
-                    hexText.onclick = () => copyToClipboard(item.hex);
-
-                    const percentText = document.createElement('span');
-                    percentText.className = 'percent-text';
-                    percentText.innerText = `${percent}%`;
-
-                    infoBox.appendChild(hexText);
-                    infoBox.appendChild(percentText);
-                    wrapper.appendChild(sphere);
-                    wrapper.appendChild(infoBox);
-                    paletteArea.appendChild(wrapper);
-                });
-
-                updateRefLinks(hexArray);
-
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                alert("분석 중 오류 발생. 이미지가 너무 복잡하거나 손상되었을 수 있습니다.");
+            }
         }
 
-        // [NEW] 디자인 이론 분석 함수
-        function analyzeDesignTheory(rankedColors) {
-            let totalSat = 0;
-            let totalLum = 0;
-            let warmCount = 0;
-            let coolCount = 0;
-            let maxLum = 0;
-            let minLum = 255;
+        // 픽셀 전체 순회 분석 (성능 최적화를 위해 캔버스 축소)
+        function analyzePixels(img) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const w = 100; // 100px로 축소하여 분석 속도 UP
+            const h = Math.floor(w * (img.naturalHeight / img.naturalWidth));
+            canvas.width = w; canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            
+            const data = ctx.getImageData(0, 0, w, h).data;
+            const counts = {};
+            let rTot = 0, gTot = 0, bTot = 0, pixelCount = 0;
+            let warmPx = 0, coolPx = 0;
 
-            rankedColors.forEach(item => {
-                const [r, g, b] = item.color;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i+3] < 128) continue; // 투명 픽셀 무시
+
+                const r = data[i], g = data[i+1], b = data[i+2];
+                const rgbKey = `${r},${g},${b}`;
                 
-                // 채도 계산 (HSL)
-                const max = Math.max(r, g, b) / 255;
-                const min = Math.min(r, g, b) / 255;
-                let s = 0;
-                if(max !== min) s = (max - min) / (1 - Math.abs(max + min - 1)); // HSL Saturation
-                totalSat += s;
+                counts[rgbKey] = (counts[rgbKey] || 0) + 1;
+                
+                rTot += r; gTot += g; bTot += b;
+                pixelCount++;
 
-                // 밝기 계산 (Luminance)
-                const lum = 0.299*r + 0.587*g + 0.114*b;
-                totalLum += lum;
-                if (lum > maxLum) maxLum = lum;
-                if (lum < minLum) minLum = lum;
-
-                // 온도 계산 (Warm vs Cool)
-                // 간단한 로직: R > B ? Warm : Cool
-                if (r > b) warmCount++; else coolCount++;
-            });
-
-            const avgSat = totalSat / rankedColors.length;
-            const avgLum = totalLum / rankedColors.length;
-            const contrastRange = maxLum - minLum; // 대비 (0~255)
-
-            // 데이터 객체화 (언어 변경 시 재사용)
-            currentAnalysisData = {
-                avgSat, contrastRange, warmCount, coolCount, avgLum
-            };
-
-            generateDesignInsight(currentAnalysisData);
-        }
-
-        function generateDesignInsight(data) {
-            const T = translations[currentLang];
-            
-            // 1. 대비 (Contrast)
-            let contrastKey = 'val-med';
-            if (data.contrastRange > 150) contrastKey = 'val-high';
-            else if (data.contrastRange < 60) contrastKey = 'val-low';
-            
-            // 2. 채도 (Vibrancy)
-            let satKey = 'val-muted';
-            if (data.avgSat > 0.4) satKey = 'val-vivid';
-
-            // 3. 온도 (Temp)
-            let tempKey = 'val-neutral';
-            if (data.warmCount > data.coolCount) tempKey = 'val-warm';
-            else if (data.coolCount > data.warmCount) tempKey = 'val-cool';
-
-            // 4. 분위기 & 용도 (Mood & Usage) 추론
-            let mood = "";
-            let usage = "";
-
-            if (currentLang === 'ko') {
-                if(satKey === 'val-vivid' && contrastKey === 'val-high') { mood = "역동적이고 강렬한"; usage = "주목도가 필요한 마케팅"; }
-                else if(satKey === 'val-muted' && tempKey === 'val-warm') { mood = "아늑하고 부드러운"; usage = "감성적인 브랜딩"; }
-                else if(tempKey === 'val-cool') { mood = "신뢰감 있고 차분한"; usage = "전문적인 기업"; }
-                else { mood = "균형 잡힌"; usage = "다목적"; }
-            } else if (currentLang === 'jp') {
-                if(satKey === 'val-vivid') { mood = "エネルギッシュな"; usage = "注目を集めるデザイン"; }
-                else { mood = "落ち着いた"; usage = "洗練されたブランディング"; }
-            } else {
-                if(satKey === 'val-vivid') { mood = "dynamic and energetic"; usage = "attention-grabbing materials"; }
-                else { mood = "calm and sophisticated"; usage = "elegant branding"; }
+                // 간단 온도 체크 (Red vs Blue)
+                if (r > b) warmPx++; else coolPx++;
             }
 
-            // UI 바 업데이트
-            document.getElementById('val-contrast').innerText = T[contrastKey];
-            document.getElementById('bar-contrast').style.width = Math.min(100, (data.contrastRange/255)*100) + '%';
-            
-            document.getElementById('val-saturation').innerText = T[satKey];
-            document.getElementById('bar-saturation').style.width = Math.min(100, data.avgSat*100) + '%';
-            
-            document.getElementById('val-temp').innerText = T[tempKey];
-            // Temp bar: Cool(Blue) left, Warm(Red) right. 
-            // warmCount 비율로 바 위치 결정
-            const totalCount = data.warmCount + data.coolCount;
-            const warmPercent = totalCount > 0 ? (data.warmCount / totalCount) * 100 : 50;
-            document.getElementById('bar-temp').style.width = warmPercent + '%';
+            return {
+                counts: counts,
+                avgR: rTot/pixelCount, avgG: gTot/pixelCount, avgB: bTot/pixelCount,
+                warmCount: warmPx, coolCount: coolPx
+            };
+        }
 
-            // 텍스트 생성
-            let text = T['insight-template']
-                .replace('{contrast}', T[contrastKey])
-                .replace('{temp}', T[tempKey])
-                .replace('{sat}', T[satKey])
-                .replace('{mood}', mood)
-                .replace('{usage}', usage);
+        // 팔레트 색상 중 실제 빈도수 높은 5개 선정
+        function getTop5Colors(palette, counts) {
+            return palette.map(color => {
+                let count = 0;
+                // 유클리드 거리로 근사 색상 카운트 합산
+                for (const key in counts) {
+                    const [r, g, b] = key.split(',').map(Number);
+                    const dist = Math.sqrt(Math.pow(r - color[0], 2) + Math.pow(g - color[1], 2) + Math.pow(b - color[2], 2));
+                    if (dist < 40) count += counts[key];
+                }
+                return { color, count, hex: rgbToHex(color[0], color[1], color[2]) };
+            })
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+        }
+
+        // ==========================================
+        // 5. 렌더링 헬퍼 함수
+        // ==========================================
+
+        function renderPalette(colors) {
+            paletteArea.innerHTML = '';
+            const totalCount = colors.reduce((acc, cur) => acc + cur.count, 0);
+
+            colors.forEach((item, idx) => {
+                const percent = totalCount > 0 ? ((item.count / totalCount) * 100).toFixed(1) : 0;
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'color-item';
+                wrapper.style.animationDelay = `${idx * 0.1}s`;
+
+                const sphere = document.createElement('div');
+                sphere.className = 'sphere';
+                sphere.style.backgroundColor = `rgb(${item.color[0]}, ${item.color[1]}, ${item.color[2]})`;
+                sphere.onclick = () => copyToClipboard(item.hex);
+
+                const info = document.createElement('div');
+                info.className = 'color-info';
+                info.innerHTML = `<span class="hex-code" onclick="copyToClipboard('${item.hex}')">${item.hex}</span>
+                                  <span class="percent-text">${percent}%</span>`;
+                
+                wrapper.appendChild(sphere);
+                wrapper.appendChild(info);
+                paletteArea.appendChild(wrapper);
+            });
+
+            // 검색 링크 업데이트
+            const q = colors[0].hex.replace('#', '') + ' ' + colors[1].hex.replace('#', '');
+            document.getElementById('btnPinterest').href = `https://www.pinterest.co.kr/search/pins/?q=color palette ${q}`;
+            document.getElementById('btnBehance').href = `https://www.behance.net/search/projects?search=color palette ${colors[0].hex.replace('#', '')}`;
+            document.getElementById('btnGoogle').href = `https://www.google.com/search?tbm=isch&q=color palette ${q}`;
+            document.querySelector('.ref-links').classList.add('visible');
+        }
+
+        function renderReport(colors, stats) {
+            // 디자인 이론 계산
+            // 1. 대비 (Contrast): 가장 밝은 색과 어두운 색의 차이
+            let maxLum = 0, minLum = 255;
+            let totalSat = 0;
             
-            document.getElementById('design-insight').innerText = text;
+            colors.forEach(c => {
+                const [r, g, b] = c.color;
+                const lum = 0.299*r + 0.587*g + 0.114*b;
+                if(lum > maxLum) maxLum = lum;
+                if(lum < minLum) minLum = lum;
+                
+                // 채도 (HSL Saturation approximation)
+                const M = Math.max(r,g,b), m = Math.min(r,g,b);
+                let s = 0;
+                if(M!==m) {
+                    const l = (M+m)/510;
+                    if(l>0 && l<1) s = (M-m)/(l<0.5 ? (M+m) : (510-M-m));
+                }
+                totalSat += s;
+            });
+            
+            const contrast = maxLum - minLum;
+            const avgSat = totalSat / colors.length;
+            const isWarm = stats.warmCount > stats.coolCount;
+
+            // 값 매핑
+            let contrastText = contrast > 150 ? "High" : (contrast < 60 ? "Low" : "Medium");
+            let satText = avgSat > 0.5 ? "Vivid" : (avgSat < 0.2 ? "Mono" : "Muted");
+            let tempText = isWarm ? "Warm" : "Cool";
+
+            // UI 바 업데이트
+            document.getElementById('val-contrast').innerText = contrastText;
+            document.getElementById('bar-contrast').style.width = Math.min(100, (contrast/255)*100) + '%';
+            
+            document.getElementById('val-saturation').innerText = satText;
+            document.getElementById('bar-saturation').style.width = Math.min(100, avgSat*100) + '%';
+            
+            document.getElementById('val-temp').innerText = tempText;
+            const totalTemp = stats.warmCount + stats.coolCount;
+            const warmRatio = totalTemp ? (stats.warmCount / totalTemp)*100 : 50;
+            document.getElementById('bar-temp').style.width = warmRatio + '%';
+
+            // 3줄 요약 생성
+            generateInsight(contrastText, satText, tempText, isWarm);
+            
             analysisCard.classList.add('visible');
         }
 
-        function getPixelData(img) {
-            const c = document.createElement('canvas'); const x = c.getContext('2d');
-            const w=100; const h=Math.floor(w*(img.naturalHeight/img.naturalWidth));
-            c.width=w; c.height=h; x.drawImage(img,0,0,w,h);
-            const d = x.getImageData(0,0,w,h).data;
-            const counts={};
-            for(let i=0; i<d.length; i+=4) {
-                if(d[i+3]<128) continue;
-                const rgb=`${d[i]},${d[i+1]},${d[i+2]}`;
-                counts[rgb]=(counts[rgb]||0)+1;
-            }
-            return {counts};
+        function generateInsight(contrast, sat, temp, isWarm) {
+            let mood = "";
+            if (sat === "Vivid" && contrast === "High") mood = "Powerful & Dynamic";
+            else if (sat === "Muted" && isWarm) mood = "Cozy & Soft";
+            else if (temp === "Cool" && contrast === "Low") mood = "Calm & Professional";
+            else mood = "Balanced & Modern";
+
+            const text = `
+                This palette features <strong>${contrast} contrast</strong> with a dominant <strong>${temp} tone</strong>.<br>
+                The <strong>${sat} saturation</strong> creates a ${mood} atmosphere.<br>
+                Ideal for designs requiring ${sat === 'Vivid' ? 'strong visual impact' : 'subtle elegance'}.
+            `;
+            document.getElementById('design-insight').innerHTML = text;
         }
 
-        function calculateColorCount(target, counts) {
-            let c=0; const th=45;
-            for(const k in counts) {
-                const [r,g,b]=k.split(',').map(Number);
-                const dist=Math.sqrt(Math.pow(r-target[0],2)+Math.pow(g-target[1],2)+Math.pow(b-target[2],2));
-                if(dist<th) c+=counts[k];
-            }
-            return c;
-        }
-
-        function updateRefLinks(hexList) {
-            const refContainer = document.getElementById('refLinks');
-            const pinterestBtn = document.getElementById('btnPinterest');
-            const behanceBtn = document.getElementById('btnBehance');
-            const googleBtn = document.getElementById('btnGoogle');
-            const queryColor = `${hexList[0]} ${hexList[1]}`; 
-            
-            const term = currentLang === 'ko' ? '컬러 팔레트' : (currentLang === 'jp' ? 'カラーパレット' : 'color palette');
-            pinterestBtn.href = `https://www.pinterest.co.kr/search/pins/?q=${term} ${queryColor.replace(/#/g, '')}`;
-            behanceBtn.href = `https://www.behance.net/search/projects?search=${term} ${hexList[0].replace(/#/g, '')}`;
-            googleBtn.href = `https://www.google.com/search?tbm=isch&q=${term} ${queryColor}`;
-            refContainer.classList.add('visible');
-        }
-
+        // ==========================================
+        // 6. 유틸리티
+        // ==========================================
         function rgbToHex(r, g, b) {
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
         }
 
         function copyToClipboard(text) {
-            if (navigator.clipboard) { navigator.clipboard.writeText(text).then(showToast); }
-            else { 
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => showToast(`Copied: ${text}`));
+            } else {
                 const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); 
-                t.select(); document.execCommand("Copy"); t.remove(); showToast(); 
+                t.select(); document.execCommand("Copy"); t.remove(); showToast(`Copied: ${text}`);
             }
         }
-        function showToast() {
-            const toast = document.getElementById('toast');
-            toast.innerText = translations[currentLang]['toast-copied'];
+
+        function showToast(msg) {
+            toast.innerText = msg;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
