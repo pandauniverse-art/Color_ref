@@ -1,273 +1,4 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panda Universe Color Extractor</title>
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-    
-    <style>
-        :root {
-            --bg-color: #111111;
-            --text-main: #ffffff;
-            --text-sub: #888888;
-            --accent: #00ff88;
-        }
-
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        #ambient-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #222, #000);
-            transition: background 1s ease;
-            opacity: 0.6;
-        }
-
-        header {
-            margin-top: 40px;
-            text-align: center;
-            z-index: 10;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, #888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p.subtitle { color: var(--text-sub); font-size: 1rem; }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-            z-index: 10;
-            padding-bottom: 60px;
-        }
-
-        .input-area {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        /* 드롭존 스타일 */
-        .drop-zone {
-            flex: 2;
-            min-width: 300px;
-            height: 350px; /* 높이 약간 증가 */
-            border: 2px dashed #444;
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.05);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .drop-zone:hover, .drop-zone.dragover, .drop-zone.active {
-            border-color: var(--accent);
-            background: rgba(0, 255, 136, 0.05);
-        }
-
-        .drop-zone img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .drop-msg {
-            text-align: center;
-            color: #666;
-            pointer-events: none;
-            line-height: 1.6;
-        }
-        
-        .highlight-text {
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .url-input-box {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        input[type="text"] {
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #444;
-            background: #222;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-        }
-        
-        input[type="text"]:focus { border-color: var(--accent); }
-
-        .btn {
-            padding: 15px;
-            border-radius: 12px;
-            border: none;
-            background: var(--text-main);
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .btn:active { transform: scale(0.98); }
-
-        /* 결과 영역 */
-        .palette-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            padding: 40px 0;
-            perspective: 1000px;
-        }
-
-        .color-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .sphere {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.3s ease;
-            box-shadow: 
-                inset 10px 10px 20px rgba(255,255,255,0.2),
-                inset -10px -10px 20px rgba(0,0,0,0.4),
-                0 15px 30px rgba(0,0,0,0.4);
-        }
-
-        .sphere::after {
-            content: '';
-            position: absolute;
-            top: 15%; left: 15%; width: 25%; height: 25%;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0));
-            filter: blur(2px);
-        }
-
-        .sphere:hover { transform: scale(1.1) rotate(10deg); }
-
-        .hex-code {
-            font-family: monospace; font-size: 1.1rem; color: #aaa;
-            cursor: pointer; transition: color 0.2s;
-        }
-        .hex-code:hover { color: white; }
-
-        .ref-links {
-            display: flex; justify-content: center; gap: 15px;
-            margin-top: 20px; opacity: 0; transition: opacity 0.5s;
-        }
-        .ref-links.visible { opacity: 1; }
-
-        .ref-btn {
-            background: #333; color: white; text-decoration: none;
-            padding: 10px 20px; border-radius: 30px; font-size: 0.9rem;
-            display: flex; align-items: center; gap: 8px; transition: background 0.3s;
-        }
-        .ref-btn:hover { background: #555; }
-
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,255,136,0.9); color: black; padding: 10px 25px;
-            border-radius: 30px; font-weight: bold; opacity: 0; pointer-events: none;
-            transition: opacity 0.3s; z-index: 100;
-        }
-        .toast.show { opacity: 1; }
-
-        @keyframes popUp { to { opacity: 1; transform: translateY(0); } }
-
-        @media (max-width: 768px) {
-            .palette-container { gap: 15px; }
-            .sphere { width: 70px; height: 70px; }
-            .container { width: 95%; }
-        }
-    </style>
-</head>
-<body>
-
-    <div id="ambient-bg"></div>
-
-    <header>
-        <h1>Mood Sphere</h1>
-        <p class="subtitle">Extract 3D Colors from your Inspiration</p>
-    </header>
-
-    <div class="container">
-        <div class="input-area">
-            <div class="drop-zone" id="dropZone" tabindex="0">
-                <div class="drop-msg">
-                    <span class="highlight-text">Ctrl + V</span> to Paste Image<br>
-                    <span style="font-size:0.9rem; margin-top:10px; display:block;">or Drag & Drop / Click to Upload</span>
-                </div>
-                <img id="previewImg" alt="Preview" crossorigin="anonymous">
-                <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            </div>
-            
-            <div class="url-input-box">
-                <p style="color:#888; font-size:0.9rem;">Or paste an image URL</p>
-                <input type="text" id="urlInput" placeholder="https://pinterest.com/image.jpg">
-                <button class="btn" onclick="loadImageFromUrl()">Extract Colors</button>
-            </div>
-        </div>
-
-        <div id="paletteArea" class="palette-container"></div>
-
-        <div id="refLinks" class="ref-links">
-            <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> Pinterest</a>
-            <a href="#" target="_blank" id="btnBehance" class="ref-btn"><span>B̄</span> Behance</a>
-            <a href="#" target="_blank" id="btnGoogle" class="ref-btn"><span>G</span> Google Images</a>
-        </div>
-    </div>
-
-    <div id="toast" class="toast">Copied!</div>
-
-    <script>
+<script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const previewImg = document.getElementById('previewImg');
@@ -277,16 +8,28 @@
         const dropMsg = document.querySelector('.drop-msg');
         const colorThief = new ColorThief();
 
-        // [핵심 1] 붙여넣기(Ctrl+V) 이벤트 리스너 추가
+        // [핵심 1] 붙여넣기(Ctrl+V) 이벤트 - 가장 확실한 방법
         document.addEventListener('paste', (e) => {
             const items = e.clipboardData.items;
+            let foundImage = false;
+            
             for (let item of items) {
                 if (item.type.indexOf('image') !== -1) {
                     const blob = item.getAsFile();
                     processFile(blob);
+                    foundImage = true;
+                    
+                    // UI 효과
                     dropZone.classList.add('active');
                     setTimeout(() => dropZone.classList.remove('active'), 200);
+                    break;
                 }
+            }
+            
+            // 이미지가 아닌 텍스트(URL 등)를 붙여넣었을 때 처리
+            if (!foundImage) {
+                 // 텍스트가 붙여넣기 된 경우 URL 입력창으로 포커스 이동 시도 가능
+                 // 여기서는 사용자가 헷갈리지 않게 조용히 넘어갑니다.
             }
         });
 
@@ -316,22 +59,50 @@
             reader.readAsDataURL(file);
         }
 
-        // [핵심 2] URL 로딩 시 CORS Proxy 사용
+        // [핵심 2] URL 로딩 로직 개선 (에러 핸들링 강화)
         function loadImageFromUrl() {
             let url = urlInput.value.trim();
             if(!url) return;
+
+            // 1. 간단한 유효성 검사: URL이 아닌 것 같은 텍스트 차단
+            if (!url.startsWith('http')) {
+                alert("올바른 인터넷 주소(http://...)가 아닙니다.");
+                return;
+            }
+
+            // 2. 이미지 확장자 체크 (경고용)
+            // 사이트 주소를 넣었을 때 미리 알려줌
+            const isImage = /\.(jpg|jpeg|png|webp|gif|bmp|svg)/i.test(url);
             
-            // CORS 우회를 위한 프록시 서버 사용 (AllOrigins)
+            // 프록시 서버 사용 (이미지 로딩 우회)
+            // 'api.allorigins.win'이 가장 안정적임
             const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
             
             previewImg.crossOrigin = "Anonymous";
             previewImg.src = proxyUrl;
-            previewImg.style.display = 'block';
-            dropMsg.style.display = 'none';
+            
+            // 로딩 시작 시 UI 변경
+            const btn = document.querySelector('.url-input-box .btn');
+            const originalBtnText = btn.innerText;
+            btn.innerText = "Loading...";
+            
+            previewImg.onload = () => {
+                previewImg.style.display = 'block';
+                dropMsg.style.display = 'none';
+                extractAndRenderColors();
+                btn.innerText = originalBtnText; // 버튼 복구
+            };
 
-            previewImg.onload = () => extractAndRenderColors();
             previewImg.onerror = () => {
-                alert("이미지를 불러올 수 없습니다. 링크가 유효하지 않거나 보안이 강력한 사이트입니다. 이미지를 '복사(Ctrl+C)'해서 '붙여넣기(Ctrl+V)' 해보세요!");
+                btn.innerText = originalBtnText; // 버튼 복구
+                
+                // 에러 메시지 분기 처리
+                if (!isImage) {
+                    alert("실패: 이미지 주소가 아니라 '웹사이트 주소'를 넣으신 것 같습니다.\n\n해결법: 이미지 위에서 우클릭 -> '이미지 주소 복사'를 선택해서 넣어주세요.");
+                } else {
+                    alert("실패: 이 사이트(핀터레스트 등)는 보안상 외부 링크를 막고 있습니다.\n\n해결법: 이미지를 '복사(Ctrl+C)'해서 화면에 '붙여넣기(Ctrl+V)' 해주세요! 그게 제일 빠릅니다.");
+                }
+                
                 dropMsg.style.display = 'block';
                 previewImg.style.display = 'none';
             };
@@ -340,7 +111,12 @@
         // 색상 추출 및 렌더링
         function extractAndRenderColors() {
             try {
+                // 색상 추출 시도
                 const colors = colorThief.getPalette(previewImg, 5);
+                
+                // 간혹 이미지가 로드되었으나 색상 추출에 실패하는 경우 방지
+                if (!colors) return;
+
                 const mainColor = colors[0];
                 ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${mainColor[0]},${mainColor[1]},${mainColor[2]}), #000)`;
 
@@ -373,7 +149,9 @@
                 updateRefLinks(hexArray);
 
             } catch (e) {
-                console.error(e);
+                console.error("Color Extraction Failed:", e);
+                // CORS 문제로 캔버스 오염 시 발생하는 에러 처리
+                alert("브라우저 보안 문제로 색상을 추출할 수 없습니다.\n이미지를 다운로드해서 업로드하거나, 캡처해서 붙여넣기(Ctrl+V) 해주세요.");
             }
         }
 
@@ -405,5 +183,3 @@
             });
         }
     </script>
-</body>
-</html>
