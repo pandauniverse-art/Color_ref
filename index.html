@@ -8,12 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     
     <style>
-        /* 스타일 정의 */
         :root {
             --bg-color: #111111;
             --text-main: #ffffff;
             --text-sub: #888888;
             --accent: #00ff88;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         body {
@@ -45,15 +45,41 @@
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-weight: 800;
-            background: linear-gradient(to right, #fff, #888);
+            background: linear-gradient(to right, #fff, #999);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-top: 0;
         }
 
-        p.subtitle { color: var(--text-sub); font-size: 1rem; margin-top: 5px; }
+        /* [NEW] 사용 가이드 섹션 */
+        .guide-box {
+            display: flex;
+            gap: 20px;
+            background: var(--glass);
+            padding: 15px 30px;
+            border-radius: 50px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .guide-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .guide-icon {
+            background: rgba(255,255,255,0.1);
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+        }
 
         .container {
             width: 90%;
@@ -85,10 +111,10 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
             overflow: hidden;
             position: relative;
-            outline: none; /* 포커스 선 제거 */
+            outline: none;
         }
 
         .drop-zone:hover, .drop-zone.dragover, .drop-zone.active {
@@ -160,14 +186,14 @@
             flex-wrap: wrap;
             padding: 40px 0;
             perspective: 1000px;
-            min-height: 150px; /* 결과 영역 확보 */
+            min-height: 150px;
         }
 
         .color-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px; /* 간격 조정 */
             opacity: 0;
             transform: translateY(20px);
             animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -197,11 +223,26 @@
 
         .sphere:hover { transform: scale(1.1) rotate(10deg); }
 
-        .hex-code {
-            font-family: monospace; font-size: 1.1rem; color: #aaa;
-            cursor: pointer; transition: color 0.2s;
+        /* 색상 정보 텍스트 스타일 */
+        .color-info {
+            text-align: center;
         }
-        .hex-code:hover { color: white; }
+
+        .hex-code {
+            font-family: monospace; 
+            font-size: 1.1rem; 
+            color: #fff;
+            display: block;
+            cursor: pointer;
+        }
+        
+        /* [NEW] 비율(%) 텍스트 */
+        .percent-text {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-top: 4px;
+            display: block;
+        }
 
         .ref-links {
             display: flex; justify-content: center; gap: 15px;
@@ -231,7 +272,7 @@
             .palette-container { gap: 15px; }
             .sphere { width: 70px; height: 70px; }
             .container { width: 95%; }
-            .drop-zone { height: 250px; }
+            .guide-box { flex-direction: column; gap: 10px; border-radius: 20px; text-align: left; }
         }
     </style>
 </head>
@@ -241,7 +282,22 @@
 
     <header>
         <h1>Mood Sphere</h1>
-        <p class="subtitle">Extract 3D Colors from your Inspiration</p>
+        <p class="subtitle">Extract 3D Colors & Ratios from your Inspiration</p>
+        
+        <div class="guide-box">
+            <div class="guide-item">
+                <div class="guide-icon">V</div>
+                <span><strong>Paste (Ctrl+V)</strong> any image directly</span>
+            </div>
+            <div class="guide-item">
+                <div class="guide-icon">D</div>
+                <span><strong>Drag & Drop</strong> files here</span>
+            </div>
+            <div class="guide-item">
+                <div class="guide-icon">U</div>
+                <span><strong>Paste URL</strong> below for web images</span>
+            </div>
+        </div>
     </header>
 
     <div class="container">
@@ -274,7 +330,6 @@
     <div id="toast" class="toast">Copied!</div>
 
     <script>
-        // 요소 선택
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const previewImg = document.getElementById('previewImg');
@@ -282,22 +337,14 @@
         const ambientBg = document.getElementById('ambient-bg');
         const urlInput = document.getElementById('urlInput');
         const dropMsg = document.querySelector('.drop-msg');
-        
-        // Color Thief 라이브러리 초기화
         const colorThief = new ColorThief();
 
-        // 1. [Ctrl + V] 붙여넣기 이벤트 감지
         document.addEventListener('paste', (e) => {
             const items = e.clipboardData.items;
-            let foundImage = false;
-            
             for (let item of items) {
                 if (item.type.indexOf('image') !== -1) {
                     const blob = item.getAsFile();
                     processFile(blob);
-                    foundImage = true;
-                    
-                    // 붙여넣기 성공 효과
                     dropZone.classList.add('active');
                     setTimeout(() => dropZone.classList.remove('active'), 200);
                     break;
@@ -305,29 +352,21 @@
             }
         });
 
-        // 2. 드래그 앤 드롭 및 클릭 업로드
         dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault(); 
-            dropZone.classList.add('dragover');
-        });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
         dropZone.addEventListener('drop', (e) => {
-            e.preventDefault(); 
-            dropZone.classList.remove('dragover');
+            e.preventDefault(); dropZone.classList.remove('dragover');
             if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
         });
-        
         fileInput.addEventListener('change', (e) => {
             if (e.target.files[0]) processFile(e.target.files[0]);
         });
 
-        // 3. 파일 처리 함수 (로컬 파일 읽기)
         function processFile(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
-                // 이미지 로드 완료 후 화면 표시
                 previewImg.onload = () => {
                     previewImg.style.display = 'block';
                     dropMsg.style.display = 'none';
@@ -337,27 +376,17 @@
             reader.readAsDataURL(file);
         }
 
-        // 4. URL 이미지 처리 함수 (CORS 해결 + 에러 핸들링)
         function loadImageFromUrl() {
             let url = urlInput.value.trim();
             if(!url) return;
-
-            // http가 없는 경우 처리
-            if (!url.startsWith('http')) {
-                alert("올바른 인터넷 주소(http://...)를 입력해주세요.");
-                return;
-            }
-
-            // 이미지인지 텍스트인지 대략 확인 (경고용)
-            const isImage = /\.(jpg|jpeg|png|webp|gif|bmp|svg)/i.test(url);
+            if (!url.startsWith('http')) { alert("올바른 인터넷 주소(http)를 입력해주세요."); return; }
             
-            // 프록시 서버(AllOrigins)를 통해 우회 접속
-            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+            // 고속 프록시 사용 (wsrv.nl)
+            const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=500&output=jpg`;
             
             previewImg.crossOrigin = "Anonymous";
             previewImg.src = proxyUrl;
             
-            // 버튼 텍스트 변경 (로딩 중)
             const btn = document.querySelector('.url-input-box .btn');
             const originalBtnText = btn.innerText;
             btn.innerText = "Loading...";
@@ -366,109 +395,145 @@
                 previewImg.style.display = 'block';
                 dropMsg.style.display = 'none';
                 extractAndRenderColors();
-                btn.innerText = originalBtnText; // 버튼 복구
+                btn.innerText = originalBtnText;
             };
-
             previewImg.onerror = () => {
-                btn.innerText = originalBtnText; // 버튼 복구
-                
-                // 에러 메시지: 이미지 주소가 아니거나 보안이 강력한 사이트인 경우
-                if (!isImage) {
-                    alert("⚠️ 실패: 이미지 주소가 아니라 '웹사이트 페이지 주소'를 입력하신 것 같습니다.\n\n[해결법]\n이미지 위에서 우클릭 -> '이미지 주소 복사'를 선택해서 넣어주세요.");
-                } else {
-                    alert("⚠️ 실패: 이 사이트는 보안상 외부 연결을 막고 있습니다.\n\n[꿀팁]\n이미지를 '복사(Ctrl+C)'해서 이 화면에 '붙여넣기(Ctrl+V)' 하세요! 100% 됩니다.");
-                }
-                
+                btn.innerText = originalBtnText;
+                alert("이미지를 불러올 수 없습니다. [Ctrl + V] 기능을 사용해주세요!");
                 dropMsg.style.display = 'block';
                 previewImg.style.display = 'none';
             };
         }
 
-        // 5. 색상 추출 및 3D 구슬 렌더링
         function extractAndRenderColors() {
             try {
-                // Color Thief로 상위 5개 색상 추출
-                const colors = colorThief.getPalette(previewImg, 5);
-                
-                if (!colors) return; // 추출 실패 시 중단
+                // 1. 색상 5개 추출
+                const colors = colorThief.getPalette(previewImg, 5, 10);
+                if (!colors) return;
 
-                // 배경 분위기 변경
+                // 2. [NEW] 색상 비율(%) 계산 함수 호출
+                const percentages = calculateColorPercentages(previewImg, colors);
+
+                // 배경색 변경
                 const mainColor = colors[0];
                 ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${mainColor[0]},${mainColor[1]},${mainColor[2]}), #000)`;
 
-                // UI 초기화
                 paletteArea.innerHTML = '';
                 const hexArray = [];
 
-                // 구슬 생성 루프
                 colors.forEach((color, index) => {
                     const hex = rgbToHex(color[0], color[1], color[2]);
                     hexArray.push(hex);
+                    // 해당 색상의 비율 가져오기
+                    const percent = percentages[index];
 
                     const wrapper = document.createElement('div');
                     wrapper.className = 'color-item';
                     wrapper.style.animationDelay = `${index * 0.1}s`;
 
-                    // 3D 구슬 생성
                     const sphere = document.createElement('div');
                     sphere.className = 'sphere';
                     sphere.style.backgroundColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
                     sphere.onclick = () => copyToClipboard(hex);
 
-                    // 헥스 코드 텍스트
-                    const text = document.createElement('span');
-                    text.className = 'hex-code';
-                    text.innerText = hex;
-                    text.onclick = () => copyToClipboard(hex);
+                    // 텍스트 정보 (Hex + %)
+                    const infoBox = document.createElement('div');
+                    infoBox.className = 'color-info';
+                    
+                    const hexText = document.createElement('span');
+                    hexText.className = 'hex-code';
+                    hexText.innerText = hex;
+                    hexText.onclick = () => copyToClipboard(hex);
+
+                    const percentText = document.createElement('span');
+                    percentText.className = 'percent-text';
+                    percentText.innerText = `${percent}%`; // 비율 표시
+
+                    infoBox.appendChild(hexText);
+                    infoBox.appendChild(percentText);
 
                     wrapper.appendChild(sphere);
-                    wrapper.appendChild(text);
+                    wrapper.appendChild(infoBox);
                     paletteArea.appendChild(wrapper);
                 });
 
                 updateRefLinks(hexArray);
 
-            } catch (e) {
-                console.error("Color Extraction Failed:", e);
-                alert("색상 추출 중 오류가 발생했습니다. (보안 문제 등)\n이미지를 '복사/붙여넣기'로 시도해보세요!");
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // 6. 외부 링크 버튼 업데이트
+        // [NEW] 색상 비율 계산 로직 (캔버스로 픽셀 분석)
+        function calculateColorPercentages(imgElement, palette) {
+            // 성능을 위해 작은 캔버스 생성
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = 100; // 분석 해상도 축소
+            const height = Math.floor(width * (imgElement.naturalHeight / imgElement.naturalWidth));
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            ctx.drawImage(imgElement, 0, 0, width, height);
+            const imageData = ctx.getImageData(0, 0, width, height).data;
+            const pixelCount = width * height;
+            
+            // 각 팔레트 색상별 카운트 배열 (0으로 초기화)
+            const counts = new Array(palette.length).fill(0);
+
+            // 모든 픽셀을 순회하며 가장 가까운 팔레트 색상 찾기
+            for (let i = 0; i < imageData.length; i += 4) {
+                const r = imageData[i];
+                const g = imageData[i+1];
+                const b = imageData[i+2];
+                // 투명한 픽셀은 무시 (알파값 < 128)
+                if (imageData[i+3] < 128) continue;
+
+                let minDistance = Infinity;
+                let closestIndex = 0;
+
+                // 현재 픽셀과 가장 가까운 팔레트 색상 찾기 (유클리드 거리)
+                palette.forEach((color, index) => {
+                    const distance = Math.sqrt(
+                        Math.pow(r - color[0], 2) +
+                        Math.pow(g - color[1], 2) +
+                        Math.pow(b - color[2], 2)
+                    );
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestIndex = index;
+                    }
+                });
+
+                counts[closestIndex]++;
+            }
+
+            // 퍼센트로 변환
+            const totalValidPixels = counts.reduce((a, b) => a + b, 0);
+            return counts.map(count => ((count / totalValidPixels) * 100).toFixed(1));
+        }
+
         function updateRefLinks(hexList) {
             const refContainer = document.getElementById('refLinks');
             const pinterestBtn = document.getElementById('btnPinterest');
             const behanceBtn = document.getElementById('btnBehance');
             const googleBtn = document.getElementById('btnGoogle');
-
             const queryColor = `${hexList[0]} ${hexList[1]}`; 
             
             pinterestBtn.href = `https://www.pinterest.co.kr/search/pins/?q=color palette ${queryColor.replace(/#/g, '')}`;
             behanceBtn.href = `https://www.behance.net/search/projects?search=color palette ${hexList[0].replace(/#/g, '')}`;
             googleBtn.href = `https://www.google.com/search?tbm=isch&q=color palette ${queryColor}`;
-
             refContainer.classList.add('visible');
         }
 
-        // 유틸: RGB -> HEX 변환
         function rgbToHex(r, g, b) {
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
         }
 
-        // 유틸: 클립보드 복사 (토스트 메시지)
         function copyToClipboard(text) {
-            // HTTPS가 아닌 경우 navigator.clipboard가 작동 안 할 수 있음 (예외 처리)
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(showToast);
-            } else {
-                // 구형 방식 (fallback)
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("Copy");
-                textArea.remove();
-                showToast();
+            if (navigator.clipboard) { navigator.clipboard.writeText(text).then(showToast); }
+            else { 
+                const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); 
+                t.select(); document.execCommand("Copy"); t.remove(); showToast(); 
             }
         }
 
