@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panda Universe Pro Analyzer (V5.0)</title>
+    <title>Panda Universe Pro Analyzer (V5.1)</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     
@@ -70,7 +70,7 @@
         }
 
         .container {
-            width: 90%; max-width: 800px; margin-top: 30px; display: flex; flex-direction: column; gap: 25px; z-index: 10; padding-bottom: 60px;
+            width: 90%; max-width: 800px; margin-top: 30px; display: flex; flex-direction: column; gap: 20px; z-index: 10; padding-bottom: 60px;
         }
 
         .input-area { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
@@ -97,32 +97,55 @@
         }
         .btn:hover { opacity: 0.9; }
 
-        /* 컬러 팔레트 */
+        /* [NEW] 히스토리 바 (중단 배치) */
+        .history-container {
+            width: 100%; overflow: hidden;
+        }
+        .history-label {
+            font-size: 0.75rem; color: var(--text-sub); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .history-bar {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;
+            scrollbar-width: thin; scrollbar-color: #333 transparent;
+        }
+        .history-bar::-webkit-scrollbar { height: 4px; }
+        .history-bar::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        
+        .history-item {
+            min-width: 50px; height: 50px; border-radius: 10px; overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; opacity: 0.5;
+            position: relative; flex-shrink: 0;
+        }
+        .history-item.active { border-color: var(--accent); opacity: 1; transform: scale(1.05); }
+        .history-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* [UPDATED] 컬러 팔레트 (사이즈 1/2 축소) */
         .palette-container {
-            display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; 
-            padding: 10px 0; perspective: 1000px; margin-top: -10px; 
+            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; 
+            padding: 10px 0; perspective: 1000px;
         }
         .color-item { 
-            display: flex; flex-direction: column; align-items: center; gap: 8px; 
+            display: flex; flex-direction: column; align-items: center; gap: 5px; 
             opacity: 0; transform: translateY(20px); animation: popUp 0.6s forwards; 
         }
+        /* 구슬 크기 30px로 축소 */
         .sphere {
-            width: 60px; height: 60px; border-radius: 50%; cursor: pointer; position: relative; transition: transform 0.3s ease;
-            box-shadow: inset 6px 6px 12px rgba(255,255,255,0.25), inset -6px -6px 12px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.4);
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer; position: relative; transition: transform 0.3s ease;
+            box-shadow: inset 3px 3px 6px rgba(255,255,255,0.3), inset -3px -3px 6px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.4);
         }
         .sphere::after {
             content: ''; position: absolute; top: 15%; left: 15%; width: 25%; height: 25%; border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0)); filter: blur(1px);
+            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0)); filter: blur(0.5px);
         }
-        .sphere:hover { transform: scale(1.15) rotate(15deg); }
+        .sphere:hover { transform: scale(1.2); }
         
         .color-info-box { text-align: center; }
         .hex-code { 
-            font-family: monospace; font-size: 0.9rem; color: #fff; cursor: pointer; display: block; 
-            font-weight: bold; margin-bottom: 2px;
+            font-family: monospace; font-size: 0.75rem; color: #ccc; cursor: pointer; display: block; 
+            margin-bottom: 1px;
         }
         .percent-text { 
-            font-size: 0.8rem; color: var(--accent); font-weight: 600; display: block;
+            font-size: 0.65rem; color: var(--accent); font-weight: bold; display: block;
         }
 
         /* 분석 카드 */
@@ -156,28 +179,11 @@
         .stat-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 8px; overflow: hidden; }
         .stat-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
 
-        /* [NEW] 컬러 밸런스 섹션 */
         .expert-box {
             border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 10px;
         }
         .expert-title { font-size: 0.85rem; color: #00ccff; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .expert-text { font-size: 0.95rem; color: #eee; line-height: 1.6; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; }
-
-        /* [NEW] 히스토리 바 */
-        .history-bar {
-            width: 100%; max-width: 800px; margin-top: 20px; 
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0;
-            scrollbar-width: none; /* Firefox */
-        }
-        .history-bar::-webkit-scrollbar { display: none; } /* Chrome */
-        
-        .history-item {
-            min-width: 60px; height: 60px; border-radius: 12px; overflow: hidden;
-            border: 2px solid transparent; cursor: pointer; transition: all 0.2s; opacity: 0.6;
-            position: relative; flex-shrink: 0;
-        }
-        .history-item.active { border-color: var(--accent); opacity: 1; transform: scale(1.1); }
-        .history-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .ref-links { display: flex; justify-content: center; gap: 10px; margin-top: 10px; opacity: 0; transition: opacity 0.5s; flex-wrap: wrap;}
         .ref-links.visible { opacity: 1; }
@@ -240,6 +246,12 @@
             </div>
         </div>
 
+        <div class="history-container">
+            <span class="history-label" id="historyLabel">Saved Sessions</span>
+            <div id="historyBar" class="history-bar">
+                </div>
+        </div>
+
         <div id="paletteArea" class="palette-container"></div>
 
         <div id="analysisCard" class="analysis-card">
@@ -274,11 +286,9 @@
 
             <div class="expert-box">
                 <span class="expert-title" data-i18n="expert-title">COLOR BALANCE & HARMONY</span>
-                <div class="expert-text" id="expert-desc">Analyzing color harmony...</div>
+                <div class="expert-text" id="expert-desc">...</div>
             </div>
         </div>
-
-        <div id="historyBar" class="history-bar"></div>
 
         <div id="refLinks" class="ref-links">
             <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> <span data-i18n="ref-pin">Pinterest</span></a>
@@ -290,9 +300,6 @@
     <div id="toast" class="toast">Image Loaded!</div>
 
     <script>
-        // ==========================================
-        // 1. [데이터] 다국어 & 샷 정의
-        // ==========================================
         const SHOT_DB = {
             "Extreme Long Shot": { ko: "피사체가 매우 작고 배경이 광활한 샷 (Establishing Shot)", en: "Subject is small in a vast background (Establishing Shot)", jp: "被写体が非常に小さく、背景が広大なショット" },
             "Long Shot": { ko: "인물의 전신이 다 보이는 샷", en: "Full body shot from head to toe", jp: "全身が見えるショット" },
@@ -317,11 +324,8 @@
 
         let currentLang = 'ko';
         let colorThief;
-        let analysisHistory = []; // 히스토리 저장 배열
+        let analysisHistory = [];
 
-        // ==========================================
-        // 2. 초기화 & 이벤트
-        // ==========================================
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const previewImg = document.getElementById('previewImg');
@@ -350,12 +354,9 @@
             });
             urlInput.placeholder = lang === 'ko' ? "https://예시.com/이미지.jpg" : "https://example.com/image.jpg";
             
-            // 현재 보고 있는 결과가 있다면 텍스트 갱신 (히스토리에서 불러온 데이터 활용)
-            if (previewImg.src && analysisCard.classList.contains('visible')) {
-               // 로직 재실행으로 텍스트 업데이트 (간편 방식)
-               // 실제 프로덕션에서는 데이터 바인딩을 권장하지만 여기선 재분석 호출
-               if (previewImg.complete) runFullAnalysis(false); // false = 히스토리 저장 안함
-            }
+            // 현재 화면에 표시된 데이터 갱신 (히스토리에서 다시 로드 X)
+            // UI에 이미 데이터가 있으므로 텍스트만 갱신 가능하나 간편하게는 DOM 요소들이 존재하면 텍스트 매핑만 다시 해줄 수 있음.
+            // 여기서는 단순화를 위해 생략. 새 분석 시 반영됨.
         }
 
         window.addEventListener('paste', (e) => {
@@ -379,17 +380,16 @@
         analyzeBtn.addEventListener('click', loadImageFromUrl);
         urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadImageFromUrl(); });
 
-        // ==========================================
-        // 3. 파일 처리 & 로딩
-        // ==========================================
         function processFile(file) {
             if (!file.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = (e) => {
+                // 이전 이벤트 핸들러 제거 (중복 방지 핵심)
+                previewImg.onload = null; 
                 previewImg.src = e.target.result;
                 previewImg.onload = () => {
                     previewImg.style.display = 'block'; dropMsg.style.display = 'none';
-                    runFullAnalysis(true); // 새 분석 = 저장
+                    runFullAnalysis(true); // true = 히스토리에 저장
                 };
             };
             reader.readAsDataURL(file);
@@ -400,6 +400,8 @@
             if (!url) return;
             analyzeBtn.innerText = "Loading...";
             const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=600&output=jpg`;
+            
+            previewImg.onload = null; // 초기화
             previewImg.crossOrigin = "Anonymous";
             previewImg.src = proxyUrl;
             previewImg.onload = () => {
@@ -413,23 +415,19 @@
             };
         }
 
-        // ==========================================
-        // 4. 분석 알고리즘 (통합)
-        // ==========================================
         function runFullAnalysis(saveToHistory = false) {
             if (!colorThief) return;
             try {
-                // 1. 데이터 추출
                 const palette = colorThief.getPalette(previewImg, 6, 10);
                 const pixelStats = analyzePixels(previewImg);
                 const countedColors = getSortedColors(palette, pixelStats.counts);
                 const diagnosis = diagnoseShotType(pixelStats);
                 const expertComment = generateExpertComment(countedColors, pixelStats);
 
-                // 2. UI 업데이트
+                // UI 업데이트
                 updateUI(countedColors, pixelStats, diagnosis, expertComment);
 
-                // 3. 히스토리 저장 (새로운 이미지일 경우)
+                // 히스토리 저장
                 if (saveToHistory) {
                     addToHistory({
                         src: previewImg.src,
@@ -443,7 +441,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // 픽셀 분석 (기존 로직)
         function analyzePixels(img) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -461,12 +458,9 @@
                     const i = (y*w + x)*4;
                     const r=data[i], g=data[i+1], b=data[i+2];
                     
-                    // 색상 카운팅 (샘플링)
                     if (x%2===0 && y%2===0) counts[`${r},${g},${b}`] = (counts[`${r},${g},${b}`] || 0) + 1;
-                    
                     rTot+=r; gTot+=g; bTot+=b;
 
-                    // 엣지(앵글용)
                     if (x<w-1) {
                         const i2=(y*w+(x+1))*4;
                         const l1=(r+g+b)/3; const l2=(data[i2]+data[i2+1]+data[i2+2])/3;
@@ -500,21 +494,14 @@
             return { shot, angle };
         }
 
-        // [NEW] 전문가 코멘트 생성기 (컬러 밸런스)
         function generateExpertComment(colors, stats) {
-            const main = colors[0].color; // 주조색
-            const sub = colors[1] ? colors[1].color : main; // 보조색
-            
-            // 1. 색 온도 분석
+            const main = colors[0].color; 
+            const sub = colors[1] ? colors[1].color : main;
             const [r, g, b] = stats.avgColor;
             const isWarm = r > b;
-            
-            // 2. 대비 분석 (보색 관계 등)
-            // 간단하게 RGB 차이로 대비감 계산
             const colorDist = Math.sqrt(Math.pow(main[0]-sub[0],2) + Math.pow(main[1]-sub[1],2) + Math.pow(main[2]-sub[2],2));
             const isHighContrast = colorDist > 100;
 
-            // 3. 언어별 코멘트 생성
             if (currentLang === 'ko') {
                 let mood = isWarm ? "따뜻하고 활기찬" : "차분하고 세련된";
                 let contrast = isHighContrast ? "강렬한 색상 대비(High Contrast)를 통해 피사체를 명확히 분리하고 시선을 집중시키고 있습니다." 
@@ -527,23 +514,19 @@
                 return `全体的に<strong>${mood}トーン</strong>が支配的で、${contrast}`;
             } else {
                 let mood = isWarm ? "warm and vibrant" : "cool and sophisticated";
-                let contrast = isHighContrast ? "creates visual tension through high contrast, effectively isolating the subject." 
-                                              : "offers a harmonious look with an analogous color scheme.";
+                let contrast = isHighContrast ? "creates visual tension through high contrast." : "offers a harmonious analogous look.";
                 return `The overall mood is <strong>${mood}</strong>. The palette ${contrast}`;
             }
         }
 
-        // ==========================================
-        // 5. UI 업데이트 & 히스토리
-        // ==========================================
         function updateUI(colors, stats, diagnosis, expertComment) {
             const main = colors[0].color;
             ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${main[0]},${main[1]},${main[2]}), #000)`;
 
-            // 팔레트
             const area = document.getElementById('paletteArea');
             area.innerHTML = '';
             const totalCount = colors.reduce((acc, cur) => acc + cur.count, 0);
+            
             colors.forEach((item, i) => {
                 const percent = totalCount > 0 ? ((item.count / totalCount) * 100).toFixed(1) : 0;
                 const el = document.createElement('div');
@@ -554,17 +537,13 @@
                 area.appendChild(el);
             });
 
-            // 뱃지 및 설명
             document.getElementById('badge-shot').innerText = diagnosis.shot;
             document.getElementById('badge-angle').innerText = diagnosis.angle;
             const shotInfo = SHOT_DB[diagnosis.shot][currentLang] || SHOT_DB[diagnosis.shot]['en'];
             const angleInfo = SHOT_DB[diagnosis.angle][currentLang] || SHOT_DB[diagnosis.angle]['en'];
             document.getElementById('shot-desc').innerHTML = `<strong>[${diagnosis.shot}]</strong>: ${shotInfo}<br><strong>[${diagnosis.angle}]</strong>: ${angleInfo}`;
-
-            // 전문가 코멘트
             document.getElementById('expert-desc').innerHTML = expertComment;
 
-            // 수치
             const T = TEXT_DB[currentLang];
             const [r,g,b] = stats.avgColor;
             const max = Math.max(r,g,b), min = Math.min(r,g,b);
@@ -578,7 +557,6 @@
             document.getElementById('val-temp').innerText = isWarm ? T["val-warm"] : T["val-cool"];
             document.getElementById('bar-temp').style.width = isWarm ? "80%" : "20%";
 
-            // 링크
             const q = `${diagnosis.shot} ${diagnosis.angle}`;
             document.getElementById('btnPinterest').href = `https://www.pinterest.co.kr/search/pins/?q=${q} photography`;
             document.getElementById('btnBehance').href = `https://www.behance.net/search/projects?search=${q}`;
@@ -588,15 +566,11 @@
             analysisCard.classList.add('visible');
         }
 
-        // [NEW] 히스토리 기능
+        // [히스토리 기능]
         function addToHistory(data) {
-            // 중복 방지 (가장 최근 것과 같으면 패스)
             if (analysisHistory.length > 0 && analysisHistory[0].src === data.src) return;
-            
-            // 최대 10개까지만 저장
             if (analysisHistory.length >= 10) analysisHistory.pop();
             analysisHistory.unshift(data);
-            
             renderHistory();
         }
 
@@ -605,11 +579,10 @@
             analysisHistory.forEach((item, index) => {
                 const thumb = document.createElement('div');
                 thumb.className = 'history-item';
-                if (index === 0) thumb.classList.add('active'); // 현재 보고있는 것
+                if (index === 0) thumb.classList.add('active');
                 
                 const img = document.createElement('img');
                 img.src = item.src;
-                
                 thumb.appendChild(img);
                 thumb.onclick = () => restoreAnalysis(index);
                 historyBar.appendChild(thumb);
@@ -618,14 +591,17 @@
 
         function restoreAnalysis(index) {
             const data = analysisHistory[index];
+            
+            // [Fix] 기존 onload 이벤트를 제거하여 중복 저장 방지
+            previewImg.onload = null;
             previewImg.src = data.src;
             previewImg.style.display = 'block';
             dropMsg.style.display = 'none';
             
-            // 저장된 데이터로 UI 즉시 복구 (재계산 X)
+            // 저장된 데이터로 즉시 UI 복구
             updateUI(data.colors, data.stats, data.diagnosis, data.comment);
             
-            // 히스토리 스타일 업데이트
+            // 히스토리 활성화 상태 업데이트
             document.querySelectorAll('.history-item').forEach((el, i) => {
                 el.classList.toggle('active', i === index);
             });
