@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panda Universe Pro Analyzer</title>
+    <title>Panda Universe Pro Analyzer (V4.0)</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     
@@ -30,13 +30,11 @@
             min-height: 100vh; overflow-x: hidden; transition: background 0.5s;
         }
 
-        /* 배경 효과 */
         #ambient-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: radial-gradient(circle at 50% 50%, #222, #000); opacity: 0.7; transition: background 1s ease;
         }
 
-        /* 헤더 */
         header {
             margin-top: 40px; text-align: center; z-index: 10; width: 90%; max-width: 800px;
         }
@@ -47,6 +45,18 @@
         }
         
         .subtitle { font-size: 0.95rem; color: var(--text-sub); letter-spacing: 0.5px; }
+
+        /* 언어 스위치 */
+        .lang-switch {
+            position: absolute; top: 0; right: 0; display: flex; gap: 5px;
+        }
+        .lang-btn {
+            background: var(--glass); color: var(--text-sub); border: 1px solid var(--border);
+            padding: 5px 10px; border-radius: 12px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s; font-weight: 600;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--accent); color: #000; border-color: var(--accent);
+        }
 
         /* 입력 가이드 */
         .guide-box {
@@ -59,14 +69,12 @@
             display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; font-weight: bold; color: var(--accent);
         }
 
-        /* 메인 컨테이너 */
         .container {
-            width: 90%; max-width: 800px; margin-top: 35px; display: flex; flex-direction: column; gap: 30px; z-index: 10; padding-bottom: 60px;
+            width: 90%; max-width: 800px; margin-top: 30px; display: flex; flex-direction: column; gap: 25px; z-index: 10; padding-bottom: 60px;
         }
 
         .input-area { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
 
-        /* 드롭존 */
         .drop-zone {
             flex: 2; min-width: 300px; height: 300px;
             border: 2px dashed #444; border-radius: 20px; display: flex; flex-direction: column;
@@ -79,7 +87,6 @@
         .drop-msg { text-align: center; color: #666; pointer-events: none; line-height: 1.6; z-index: 1; font-size: 0.95rem; }
         .highlight-text { color: var(--accent); font-weight: bold; font-size: 1.1rem; }
 
-        /* URL 입력 */
         .url-input-box { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
         input[type="text"] {
             padding: 15px; border-radius: 12px; border: 1px solid #444; background: #222; color: white; font-size: 1rem; outline: none; width: 100%;
@@ -90,43 +97,10 @@
         }
         .btn:hover { opacity: 0.9; }
 
-        /* [NEW] 15종 분석 카드 */
-        .analysis-card {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px;
-            padding: 25px; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
-            display: none; flex-direction: column; gap: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .analysis-card.visible { opacity: 1; transform: translateY(0); display: flex; }
-
-        /* 샷 타입 뱃지 */
-        .shot-badge-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 5px; }
-        .shot-badge {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%); color: #000;
-            padding: 8px 16px; border-radius: 30px; font-weight: 800; font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0,255,136,0.3);
-        }
-        .angle-badge {
-            background: #333; color: #fff; padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 0.9rem; border: 1px solid #555;
-        }
-
-        /* 샷 설명 텍스트 */
-        .shot-desc-box {
-            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; border-left: 4px solid var(--accent);
-        }
-        .shot-title { color: var(--accent); font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display: block; }
-        .shot-desc { color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0; }
-
-        /* 기존 통계 바 */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
-        .stat-item { text-align: left; }
-        .stat-label { font-size: 0.8rem; color: var(--text-sub); display: block; margin-bottom: 6px; }
-        .stat-value { font-size: 1rem; font-weight: bold; color: var(--text-main); }
-        .stat-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 8px; overflow: hidden; }
-        .stat-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
-
-        /* 컬러 팔레트 */
+        /* 컬러 팔레트 (상단 배치) */
         .palette-container {
-            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 10px 0; perspective: 1000px;
+            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; 
+            padding: 10px 0; perspective: 1000px; margin-top: -10px; 
         }
         .color-item { display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; transform: translateY(20px); animation: popUp 0.6s forwards; }
         .sphere {
@@ -141,8 +115,38 @@
         .hex-code { font-family: monospace; font-size: 0.85rem; color: #fff; cursor: pointer; opacity: 0.8; }
         .percent-text { font-size: 0.75rem; color: var(--text-sub); }
 
-        /* 레퍼런스 링크 */
-        .ref-links { display: flex; justify-content: center; gap: 10px; margin-top: 20px; opacity: 0; transition: opacity 0.5s; flex-wrap: wrap;}
+        /* 분석 카드 */
+        .analysis-card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px;
+            padding: 25px; opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
+            display: none; flex-direction: column; gap: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .analysis-card.visible { opacity: 1; transform: translateY(0); display: flex; }
+
+        .shot-badge-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 5px; }
+        .shot-badge {
+            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%); color: #000;
+            padding: 8px 16px; border-radius: 30px; font-weight: 800; font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,255,136,0.3);
+        }
+        .angle-badge {
+            background: #333; color: #fff; padding: 8px 16px; border-radius: 30px; font-weight: 600; font-size: 0.9rem; border: 1px solid #555;
+        }
+
+        .shot-desc-box {
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; border-left: 4px solid var(--accent);
+        }
+        .shot-title { color: var(--accent); font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display: block; }
+        .shot-desc { color: #ddd; font-size: 0.95rem; line-height: 1.5; margin: 0; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
+        .stat-item { text-align: left; }
+        .stat-label { font-size: 0.8rem; color: var(--text-sub); display: block; margin-bottom: 6px; }
+        .stat-value { font-size: 1rem; font-weight: bold; color: var(--text-main); }
+        .stat-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+        .stat-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
+
+        .ref-links { display: flex; justify-content: center; gap: 10px; margin-top: 10px; opacity: 0; transition: opacity 0.5s; flex-wrap: wrap;}
         .ref-links.visible { opacity: 1; }
         .ref-btn {
             background: #333; color: white; text-decoration: none; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: background 0.3s;
@@ -169,13 +173,19 @@
     <div id="ambient-bg"></div>
 
     <header>
-        <h1>Panda Universe Pro</h1>
-        <p class="subtitle">AI Based Camera Shot & Angle Analyzer</p>
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+            <button class="lang-btn" onclick="setLanguage('ko')">KR</button>
+            <button class="lang-btn" onclick="setLanguage('jp')">JP</button>
+        </div>
+
+        <h1 data-i18n="title">Panda Universe Pro</h1>
+        <p class="subtitle" data-i18n="subtitle">AI Based Camera Shot & Angle Analyzer</p>
         
         <div class="guide-box">
-            <span><span class="guide-icon">V</span>Ctrl+V Paste</span>
-            <span><span class="guide-icon">D</span>Drag & Drop</span>
-            <span><span class="guide-icon">U</span>URL Link</span>
+            <span><span class="guide-icon">V</span><span data-i18n="guide-paste">Ctrl+V Paste</span></span>
+            <span><span class="guide-icon">D</span><span data-i18n="guide-drag">Drag & Drop</span></span>
+            <span><span class="guide-icon">U</span><span data-i18n="guide-url">URL Link</span></span>
         </div>
     </header>
 
@@ -183,19 +193,21 @@
         <div class="input-area">
             <div class="drop-zone" id="dropZone">
                 <div class="drop-msg">
-                    <span class="highlight-text">Ctrl + V</span> to Paste Image<br>
-                    <span style="font-size:0.9rem; opacity:0.7;">Drag & Drop / Click to Upload</span>
+                    <span class="highlight-text">Ctrl + V</span> <span data-i18n="drop-main">to Paste</span><br>
+                    <span data-i18n="drop-sub" style="font-size:0.9rem; opacity:0.7;">Drag & Drop / Click</span>
                 </div>
                 <img id="previewImg" alt="Preview" crossorigin="anonymous">
                 <input type="file" id="fileInput" accept="image/*" style="display: none;">
             </div>
             
             <div class="url-input-box">
-                <p style="color:#888; font-size:0.9rem; margin:0;">Or paste image URL</p>
+                <p style="color:#888; font-size:0.9rem; margin:0;" data-i18n="url-label">Or paste image URL</p>
                 <input type="text" id="urlInput" placeholder="https://example.com/image.jpg">
-                <button class="btn" id="analyzeBtn">Analyze Image</button>
+                <button class="btn" id="analyzeBtn" data-i18n="btn-analyze">Analyze Image</button>
             </div>
         </div>
+
+        <div id="paletteArea" class="palette-container"></div>
 
         <div id="analysisCard" class="analysis-card">
             
@@ -205,35 +217,33 @@
             </div>
 
             <div class="shot-desc-box">
-                <span class="shot-title" id="shot-title">ANALYSIS RESULT</span>
-                <p class="shot-desc" id="shot-desc">이미지를 업로드하면 15가지 샷 종류 중 하나를 진단해드립니다.</p>
+                <span class="shot-title" id="shot-title" data-i18n="shot-title">ANALYSIS RESULT</span>
+                <p class="shot-desc" id="shot-desc">...</p>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-item">
-                    <span class="stat-label">Contrast (대비)</span>
+                    <span class="stat-label" data-i18n="stat-contrast">Contrast</span>
                     <span class="stat-value" id="val-contrast">-</span>
                     <div class="stat-bar"><div class="stat-fill" id="bar-contrast"></div></div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Vibrancy (생동감)</span>
+                    <span class="stat-label" data-i18n="stat-vibrancy">Vibrancy</span>
                     <span class="stat-value" id="val-vibrancy">-</span>
                     <div class="stat-bar"><div class="stat-fill" id="bar-vibrancy"></div></div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Color Temp (온도)</span>
+                    <span class="stat-label" data-i18n="stat-temp">Temp</span>
                     <span class="stat-value" id="val-temp">-</span>
                     <div class="stat-bar"><div class="stat-fill" id="bar-temp" style="background: linear-gradient(90deg, #4facfe 0%, #ff6b6b 100%);"></div></div>
                 </div>
             </div>
         </div>
 
-        <div id="paletteArea" class="palette-container"></div>
-
         <div id="refLinks" class="ref-links">
-            <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> Pinterest Search</a>
-            <a href="#" target="_blank" id="btnBehance" class="ref-btn"><span>B̄</span> Behance Search</a>
-            <a href="#" target="_blank" id="btnGoogle" class="ref-btn"><span>G</span> Google Images</a>
+            <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> <span data-i18n="ref-pin">Pinterest</span></a>
+            <a href="#" target="_blank" id="btnBehance" class="ref-btn"><span>B̄</span> <span data-i18n="ref-beh">Behance</span></a>
+            <a href="#" target="_blank" id="btnGoogle" class="ref-btn"><span>G</span> <span data-i18n="ref-goog">Google</span></a>
         </div>
     </div>
 
@@ -241,31 +251,119 @@
 
     <script>
         // ==========================================
-        // 1. [데이터] 15가지 샷 & 앵글 정의 사전
+        // 1. [데이터] 다국어 & 15종 샷 정의
         // ==========================================
-        const SHOT_DEFINITIONS = {
-            // Shot Sizes
-            "Extreme Long Shot": { desc: "피사체가 매우 작게 보이고 배경이 광활하게 펼쳐진 샷입니다. 영화의 도입부(Establishing Shot)나 인물의 고립감, 대자연의 웅장함을 표현할 때 주로 사용됩니다." },
-            "Long Shot": { desc: "인물의 머리부터 발끝까지 전신이 다 보이는 샷입니다. 인물과 주위 환경의 관계를 보여주거나, 신체적인 움직임(액션, 춤)을 담을 때 효과적입니다." },
-            "Full Shot": { desc: "화면의 세로 높이에 인물의 전신을 꽉 채운 샷입니다. 롱샷보다 인물에 더 집중하며, 당당함이나 전체적인 스타일을 보여줄 때 사용합니다." },
-            "Knee Shot": { desc: "무릎 위부터 머리까지 보여주는 샷입니다(3/4 샷). 걸어 다니는 장면이나 두 명 이상의 대화 장면에서 역동성과 안정감을 동시에 줍니다." },
-            "Medium Shot": { desc: "허리 위부터 머리까지 보여주는 가장 표준적인 샷입니다. 뉴스, 인터뷰, 대화 장면에서 정보 전달과 표정을 동시에 담기에 가장 적합합니다." },
-            "Close Up": { desc: "어깨선 위나 얼굴 전체를 가득 채운 샷입니다. 배경을 배제하고 인물의 미세한 표정 변화와 감정선에 관객을 몰입시킬 때 필수적입니다." },
-            "Extreme Close Up": { desc: "눈, 입술 등 특정 부위만을 아주 가깝게 잡은 샷입니다. 극도의 긴장감이나 숨겨진 디테일, 내면의 심리를 강렬하게 표현합니다." },
+        const SHOT_DB = {
+            "Extreme Long Shot": { 
+                ko: "피사체가 매우 작고 배경이 광활한 샷입니다. (Establishing Shot)", 
+                en: "Subject looks small in a vast background. (Establishing Shot)",
+                jp: "被写体が非常に小さく、背景が広大なショットです。"
+            },
+            "Long Shot": { 
+                ko: "인물의 머리부터 발끝까지 전신이 보이는 샷입니다.",
+                en: "Full body shot from head to toe.",
+                jp: "人物の頭から足先まで全身が見えるショットです。"
+            },
+            "Full Shot": { 
+                ko: "화면에 인물의 전신이 꽉 차게 들어온 샷입니다.",
+                en: "The subject fills the frame from top to bottom.",
+                jp: "画面に人物の全身がいっぱいに映るショットです。"
+            },
+            "Knee Shot": { 
+                ko: "무릎 위부터 머리까지 보여주는 샷입니다 (3/4 샷).",
+                en: "Shot showing from the knees up (3/4 Shot).",
+                jp: "膝上から頭までを見せるショットです（3/4ショット）。"
+            },
+            "Medium Shot": { 
+                ko: "허리 위부터 머리까지 보여주는 표준적인 샷입니다.",
+                en: "Standard shot from waist up.",
+                jp: "腰から上を見せる標準的なショットです。"
+            },
+            "Close Up": { 
+                ko: "어깨 위나 얼굴 전체를 가득 채워 감정을 강조한 샷입니다.",
+                en: "Face fills the frame, emphasizing emotions.",
+                jp: "肩や顔全体をいっぱいに映し、感情を強調したショットです。"
+            },
+            "Extreme Close Up": { 
+                ko: "눈, 입술 등 특정 부위만을 극도로 가깝게 잡은 샷입니다.",
+                en: "Intense detail shot of eyes, lips, etc.",
+                jp: "目や唇など特定の部位を極端にクローズアップしたショットです。"
+            },
             
-            // Angles
-            "Bird's Eye View": { desc: "새가 내려다보듯 90도 수직 위에서 찍은 앵글입니다. 지형의 기하학적 패턴을 보여주거나, 신적인 관조적 시점을 표현합니다." },
-            "High Angle": { desc: "카메라가 위에서 아래로 피사체를 내려다보는 앵글입니다. 피사체를 작고 약해 보이게 만들어, 무력감이나 외로움, 귀여움을 강조합니다." },
-            "Eye Level": { desc: "피사체의 눈높이와 동일한 수평 앵글입니다. 관객에게 가장 편안하고 객관적인 느낌을 주며, 사실적인 묘사에 적합합니다." },
-            "Low Angle": { desc: "카메라가 아래에서 위로 피사체를 올려다보는 앵글입니다. 피사체를 거대하고 위압적으로 보이게 하여, 권위, 공포, 영웅적인 힘을 표현합니다." },
-            "Worm's Eye View": { desc: "바닥에 붙어서 위를 쳐다보는 극단적인 로우 앵글입니다. 비현실적인 거대함이나 벌레, 동물의 시선 같은 독특한 경험을 제공합니다." },
-            "Dutch Angle": { desc: "카메라를 비스듬히 기울여 찍은 앵글입니다. 심리적 불안, 혼란, 취한 상태, 혹은 긴박한 액션 상황을 시각적으로 암시합니다." },
-            "Over the Shoulder": { desc: "한 인물의 어깨 걸고 다른 인물을 찍는 샷입니다. 대화 장면에서 두 사람의 관계와 거리감을 입체적으로 보여줍니다." },
-            "Point of View": { desc: "특정 캐릭터의 시선으로 바라보는 1인칭 샷입니다. 관객이 그 캐릭터가 된 듯한 몰입감과 직접적인 체험을 제공합니다." }
+            "Bird's Eye View": { 
+                ko: "90도 수직 위에서 내려다본 앵글입니다.", 
+                en: "90-degree overhead angle.",
+                jp: "90度真上から見下ろしたアングルです。"
+            },
+            "High Angle": { 
+                ko: "위에서 아래로 내려다보며 피사체를 작게 만듭니다.",
+                en: "Looking down, making subject appear smaller.",
+                jp: "上から見下ろし、被写体を小さく見せます。"
+            },
+            "Eye Level": { 
+                ko: "눈높이와 동일한 수평 앵글로 편안함을 줍니다.",
+                en: "Neutral angle at eye level.",
+                jp: "目の高さと同じ水平アングルで安心感を与えます。"
+            },
+            "Low Angle": { 
+                ko: "아래에서 위로 올려다보며 웅장함을 강조합니다.",
+                en: "Looking up, emphasizing power/grandeur.",
+                jp: "下から見上げ、雄大さを強調します。"
+            },
+            "Worm's Eye View": { 
+                ko: "바닥에 붙어서 위를 쳐다보는 극단적인 로우 앵글입니다.",
+                en: "Extreme low angle from the ground.",
+                jp: "地面に張り付いて上を見上げる極端なローアングルです。"
+            },
+            "Dutch Angle": { 
+                ko: "화면을 기울여 불안감이나 역동성을 표현합니다.",
+                en: "Tilted camera angle creating tension.",
+                jp: "画面を傾けて不安感や躍動感を表現します。"
+            }
         };
 
+        const TEXT_DB = {
+            en: {
+                "title": "Panda Universe Pro", "subtitle": "AI Based Camera Shot & Angle Analyzer",
+                "guide-paste": "Ctrl+V Paste", "guide-drag": "Drag & Drop", "guide-url": "URL Link",
+                "drop-main": "to Paste", "drop-sub": "Drag & Drop / Click",
+                "url-label": "Or paste image URL", "btn-analyze": "Analyze Image",
+                "shot-title": "ANALYSIS RESULT",
+                "stat-contrast": "Contrast", "stat-vibrancy": "Vibrancy", "stat-temp": "Temp",
+                "ref-pin": "Pinterest", "ref-beh": "Behance", "ref-goog": "Google",
+                "val-high": "High", "val-med": "Medium", "val-low": "Low",
+                "val-vivid": "Vivid", "val-muted": "Muted", "val-warm": "Warm", "val-cool": "Cool"
+            },
+            ko: {
+                "title": "판다 유니버스 프로", "subtitle": "AI 기반 카메라 샷 & 앵글 분석기",
+                "guide-paste": "Ctrl+V 붙여넣기", "guide-drag": "드래그 업로드", "guide-url": "URL 주소",
+                "drop-main": "이미지 붙여넣기", "drop-sub": "드래그 또는 클릭",
+                "url-label": "또는 이미지 URL", "btn-analyze": "이미지 분석",
+                "shot-title": "분석 결과",
+                "stat-contrast": "대비 (Contrast)", "stat-vibrancy": "생동감 (Vibrancy)", "stat-temp": "온도 (Temp)",
+                "ref-pin": "핀터레스트", "ref-beh": "비핸스", "ref-goog": "구글",
+                "val-high": "높음", "val-med": "중간", "val-low": "낮음",
+                "val-vivid": "선명함", "val-muted": "차분함", "val-warm": "따뜻함", "val-cool": "차가움"
+            },
+            jp: {
+                "title": "パンダユニバースPro", "subtitle": "AIベースのカメラショット＆アングル分析",
+                "guide-paste": "Ctrl+V 貼り付け", "guide-drag": "ドラッグ", "guide-url": "URL リンク",
+                "drop-main": "貼り付け", "drop-sub": "ドラッグ または クリック",
+                "url-label": "または画像URL", "btn-analyze": "画像分析",
+                "shot-title": "分析結果",
+                "stat-contrast": "コントラスト", "stat-vibrancy": "鮮やかさ", "stat-temp": "色温度",
+                "ref-pin": "Pinterest", "ref-beh": "Behance", "ref-goog": "Google",
+                "val-high": "高い", "val-med": "普通", "val-low": "低い",
+                "val-vivid": "鮮やか", "val-muted": "落ち着いた", "val-warm": "暖かい", "val-cool": "冷たい"
+            }
+        };
+
+        let currentLang = 'ko';
+        let lastDiagnosis = null;
+        let colorThief;
+
         // ==========================================
-        // 2. 초기화 및 이벤트 리스너 (강제 납치 모드)
+        // 2. 초기화 & 이벤트
         // ==========================================
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
@@ -277,13 +375,26 @@
         const dropMsg = document.querySelector('.drop-msg');
         const analysisCard = document.getElementById('analysisCard');
         const toast = document.getElementById('toast');
-        
-        let colorThief;
-        
+
         window.onload = () => {
             if (typeof ColorThief !== 'undefined') colorThief = new ColorThief();
-            else alert("라이브러리 로드 실패. 새로고침 해주세요.");
+            setLanguage(currentLang);
         };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.toLowerCase().includes(lang === 'ko' ? 'kr' : lang));
+            });
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (TEXT_DB[lang][key]) el.innerHTML = TEXT_DB[lang][key];
+            });
+            urlInput.placeholder = lang === 'ko' ? "https://예시.com/이미지.jpg" : "https://example.com/image.jpg";
+            
+            // 분석 결과가 있으면 텍스트 갱신
+            if(lastDiagnosis) updateAnalysisText(lastDiagnosis);
+        }
 
         // Global Paste
         window.addEventListener('paste', (e) => {
@@ -307,7 +418,6 @@
 
         dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => { if(e.target.files.length) processFile(e.target.files[0]); });
-        
         analyzeBtn.addEventListener('click', loadImageFromUrl);
         urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadImageFromUrl(); });
 
@@ -315,7 +425,7 @@
         // 3. 파일 처리
         // ==========================================
         function processFile(file) {
-            if (!file.type.startsWith('image/')) { alert("이미지 파일만 가능합니다."); return; }
+            if (!file.type.startsWith('image/')) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewImg.src = e.target.result;
@@ -338,150 +448,124 @@
             
             previewImg.onload = () => {
                 previewImg.style.display = 'block'; dropMsg.style.display = 'none';
-                analyzeBtn.innerText = "Analyze Image";
+                analyzeBtn.innerText = TEXT_DB[currentLang]["btn-analyze"];
                 runFullAnalysis();
             };
             previewImg.onerror = () => {
-                analyzeBtn.innerText = "Analyze Image";
-                alert("이미지 로드 실패. 보안 문제일 수 있습니다. Ctrl+V 기능을 사용하세요.");
+                analyzeBtn.innerText = TEXT_DB[currentLang]["btn-analyze"];
+                alert("Load Failed. Try Ctrl+V.");
             };
         }
 
         // ==========================================
-        // 4. [핵심] 통합 분석 로직 (Shot & Angle)
+        // 4. 알고리즘 (엣지 & 무게중심)
         // ==========================================
         function runFullAnalysis() {
             if (!colorThief) return;
             try {
-                // A. 색상 추출
                 const palette = colorThief.getPalette(previewImg, 6, 10);
-                
-                // B. 픽셀 데이터 분석 (구도/밝기 등)
                 const pixelStats = analyzePixels(previewImg);
+                const diagnosis = diagnoseShotType(pixelStats);
                 
-                // C. 샷 종류 진단 (알고리즘)
-                const diagnosis = diagnoseShotType(pixelStats, previewImg.naturalWidth, previewImg.naturalHeight);
-
-                // UI 업데이트
+                lastDiagnosis = diagnosis; // 언어 변경 시 사용
+                
                 updateUI(palette, pixelStats, diagnosis);
-
             } catch (e) { console.error(e); }
         }
 
-        // 픽셀 분석기
         function analyzePixels(img) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const w = 150; const h = Math.floor(w * (img.naturalHeight / img.naturalWidth));
+            const w = 120; const h = Math.floor(w * (img.naturalHeight / img.naturalWidth));
             canvas.width = w; canvas.height = h;
             ctx.drawImage(img, 0, 0, w, h);
             
             const data = ctx.getImageData(0, 0, w, h).data;
             let rTot=0, gTot=0, bTot=0;
-            let topBri=0, botBri=0, centerFocus=0, edgeDetail=0;
-            
-            // 픽셀 순회
+            let activePixelCount = 0; // 엣지(디테일)가 있는 픽셀 수
+            let verticalMass = 0; // 수직 무게중심
+            let totalEnergy = 0;
+
+            // 1. 픽셀 순회 & 엣지 검출 (인접 픽셀과의 차이)
             for (let y=0; y<h; y++) {
                 for (let x=0; x<w; x++) {
                     const i = (y*w + x)*4;
                     const r=data[i], g=data[i+1], b=data[i+2];
-                    const bri = (r+g+b)/3;
                     
+                    // 평균 색상용
                     rTot+=r; gTot+=g; bTot+=b;
 
-                    // 상단 vs 하단 밝기 (앵글 추정용)
-                    if (y < h/3) topBri += bri;
-                    else if (y > h*2/3) botBri += bri;
-
-                    // 중앙 집중도 (샷 사이즈 추정용 - 중앙부의 엣지/복잡도)
-                    // 간단히 중앙부 픽셀과 주변부 픽셀의 차이를 봄
-                    if (x > w/3 && x < w*2/3 && y > h/3 && y < h*2/3) {
-                        centerFocus += bri;
+                    // 엣지 계산 (간이) - 오른쪽 픽셀과의 밝기 차이
+                    if (x < w-1) {
+                        const i2 = (y*w + (x+1))*4;
+                        const lum1 = (r+g+b)/3;
+                        const lum2 = (data[i2]+data[i2+1]+data[i2+2])/3;
+                        const diff = Math.abs(lum1 - lum2);
+                        
+                        if (diff > 15) { // 의미 있는 디테일
+                            activePixelCount++;
+                            verticalMass += y; // y좌표 누적
+                            totalEnergy++;
+                        }
                     }
                 }
             }
             
-            const totalPixels = w*h;
+            // 무게중심 (0.0 ~ 1.0)
+            // 값이 0에 가까우면 상단에 디테일 집중 (Low Angle 가능성)
+            // 값이 1에 가까우면 하단에 디테일 집중 (High Angle 가능성)
+            const vCenter = totalEnergy > 0 ? (verticalMass / totalEnergy) / h : 0.5;
+            
+            // Active Ratio: 화면 중 디테일이 차지하는 비중 (Shot Size용)
+            const activeRatio = totalEnergy / (w*h);
+
             return {
-                avgColor: [Math.round(rTot/totalPixels), Math.round(gTot/totalPixels), Math.round(bTot/totalPixels)],
-                topBri: topBri / (totalPixels/3),
-                botBri: botBri / (totalPixels/3),
-                centerFocus: centerFocus / (totalPixels/9),
+                avgColor: [Math.round(rTot/(w*h)), Math.round(gTot/(w*h)), Math.round(bTot/(w*h))],
+                vCenter: vCenter,
+                activeRatio: activeRatio,
                 aspectRatio: img.naturalWidth / img.naturalHeight
             };
         }
 
-        // [알고리즘] 샷 & 앵글 진단 로직
-        function diagnoseShotType(stats, w, h) {
-            // 1. 앵글 진단 (밝기 구배 기반 추정)
+        function diagnoseShotType(stats) {
+            // 1. Angle 진단 (무게중심 기반)
             let angle = "Eye Level";
-            const briDiff = stats.topBri - stats.botBri;
+            // 무게중심이 매우 위쪽 (0.35 이하) -> 피사체 머리가 위에 있고 몸이 아래로 퍼짐 -> Low Angle
+            // *수정*: 로우앵글은 피사체가 위압적. 상단에 하늘(빈공간)이 많으면 하이앵글일수도?
+            // V4.0 로직:
+            // High Angle: 바닥이 보임. 화면 전체에 텍스처가 균일하거나, 무게중심이 중앙~하단.
+            // Low Angle: 하늘이 보임. 상단이 깔끔(Sky)하고 하단이 복잡(Body). -> 무게중심 하단?
+            // 아니, 로우앵글로 사람을 찍으면 머리가 상단, 몸이 하단. 몸이 더 크므로 하단이 무거움.
+            // 하이앵글로 사람을 찍으면 머리가 크고(상단), 몸이 작음(하단). 상단이 무거움.
             
-            if (briDiff > 60) angle = "Low Angle"; // 위가 밝고(하늘) 아래가 어두우면 로우앵글 가능성
-            else if (briDiff < -40) angle = "High Angle"; // 위가 어둡고(땅) 아래가 밝으면 하이앵글 가능성
+            if (stats.vCenter < 0.42) angle = "High Angle"; // 상단이 무거움 (머리 큼/바닥 배경)
+            else if (stats.vCenter > 0.58) angle = "Low Angle"; // 하단이 무거움 (몸 큼/하늘 배경)
             
-            // 극단적 비율이면 파노라마/버즈아이 추정
-            if (stats.aspectRatio > 2.0) angle = "Wide / Panorama";
-            
-            // 2. 샷 사이즈 진단 (중앙 집중도 및 비율 기반)
-            // *실제 AI 객체 인식 없이는 추정이지만, 픽셀 밀도차로 근사*
-            let shot = "Medium Shot"; // 기본값
-            
-            // 중앙부가 전체 평균보다 현저히 밝거나 튀면 클로즈업 가능성
-            const avgBri = (stats.topBri + stats.botBri) / 2;
-            const focusRatio = stats.centerFocus / avgBri;
+            // 2. Shot Size 진단 (Active Ratio 기반)
+            let shot = "Medium Shot";
+            // 디테일이 화면 꽉 참 -> Close Up
+            // 디테일이 적음(여백 많음) -> Long Shot
+            if (stats.activeRatio > 0.35) shot = "Close Up";
+            else if (stats.activeRatio > 0.15) shot = "Medium Shot";
+            else shot = "Long Shot";
 
-            if (focusRatio > 1.3) shot = "Close Up";
-            else if (focusRatio > 1.1) shot = "Medium Shot";
-            else if (Math.abs(stats.topBri - stats.botBri) < 20) shot = "Extreme Close Up"; // 전체가 균일 = 매크로
-            else shot = "Long Shot"; // 전체적으로 분산됨
+            // 보정
+            if (stats.activeRatio > 0.6) shot = "Extreme Close Up";
+            if (stats.activeRatio < 0.05) shot = "Extreme Long Shot";
 
-            // 3. 더치 앵글 (랜덤성/가정 - 픽셀로는 한계가 있어 시각적 재미를 위해 조합)
-            // 여기선 예시로 특정 조건일 때 Dutch를 띄움 (실제론 선 검출 필요)
-            
-            return { shot: shot, angle: angle };
+            // Dutch Angle (랜덤성이 아닌 가로세로 비율과 엣지 분포로 추정은 어렵지만..)
+            // *여기선 Eye Level일때 미세 조정*
+            if (angle === "Eye Level" && stats.activeRatio > 0.25) shot = "Full Shot";
+
+            return { shot, angle };
         }
 
-        // ==========================================
-        // 5. UI 업데이트
-        // ==========================================
         function updateUI(palette, stats, diagnosis) {
-            // 배경색
+            // 배경
             const main = palette[0];
             ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${main[0]},${main[1]},${main[2]}), #000)`;
 
-            // 1. 뱃지 업데이트
-            document.getElementById('badge-shot').innerText = diagnosis.shot;
-            document.getElementById('badge-angle').innerText = diagnosis.angle;
-
-            // 2. 전문가 코멘트 (Dictionary 매칭)
-            let defData = SHOT_DEFINITIONS[diagnosis.shot] || SHOT_DEFINITIONS["Medium Shot"];
-            let angleData = SHOT_DEFINITIONS[diagnosis.angle] || SHOT_DEFINITIONS["Eye Level"];
-            
-            document.getElementById('shot-title').innerText = `${diagnosis.shot} & ${diagnosis.angle}`;
-            document.getElementById('shot-desc').innerHTML = 
-                `<strong>[${diagnosis.shot}]:</strong> ${defData.desc}<br><br>
-                 <strong>[${diagnosis.angle}]:</strong> ${angleData.desc}`;
-
-            // 3. 통계 바 업데이트
-            // Contrast (밝기 차이)
-            const contrast = Math.abs(stats.topBri - stats.botBri) * 1.5; 
-            document.getElementById('val-contrast').innerText = contrast > 80 ? "High" : "Medium";
-            document.getElementById('bar-contrast').style.width = Math.min(100, contrast) + '%';
-
-            // Vibrancy (채도 근사값)
-            const [r,g,b] = stats.avgColor;
-            const max = Math.max(r,g,b), min = Math.min(r,g,b);
-            const sat = (max - min) / max * 100;
-            document.getElementById('val-vibrancy').innerText = sat > 40 ? "Vivid" : "Muted";
-            document.getElementById('bar-vibrancy').style.width = sat + '%';
-
-            // Temp
-            const isWarm = r > b;
-            document.getElementById('val-temp').innerText = isWarm ? "Warm" : "Cool";
-            document.getElementById('bar-temp').style.width = isWarm ? "80%" : "20%";
-
-            // 4. 팔레트 렌더링
+            // 팔레트 렌더링
             const area = document.getElementById('paletteArea');
             area.innerHTML = '';
             palette.forEach((c, i) => {
@@ -496,17 +580,49 @@
                 area.appendChild(el);
             });
 
-            // 5. 검색 링크
-            const query = `${diagnosis.shot} ${diagnosis.angle} photography`;
-            document.getElementById('btnPinterest').href = `https://www.pinterest.co.kr/search/pins/?q=${query}`;
-            document.getElementById('btnBehance').href = `https://www.behance.net/search/projects?search=${query}`;
-            document.getElementById('btnGoogle').href = `https://www.google.com/search?tbm=isch&q=${query}`;
+            // 텍스트 업데이트
+            updateAnalysisText(diagnosis);
+            
+            // 수치 업데이트
+            const T = TEXT_DB[currentLang];
+            // Contrast (밝기 차이 근사)
+            // Vibrancy (채도)
+            const [r,g,b] = stats.avgColor;
+            const max = Math.max(r,g,b), min = Math.min(r,g,b);
+            const sat = max===0 ? 0 : (max-min)/max * 100;
+            
+            document.getElementById('val-contrast').innerText = stats.activeRatio > 0.2 ? T["val-high"] : T["val-low"];
+            document.getElementById('bar-contrast').style.width = Math.min(100, stats.activeRatio*300) + '%';
+            
+            document.getElementById('val-vibrancy').innerText = sat > 40 ? T["val-vivid"] : T["val-muted"];
+            document.getElementById('bar-vibrancy').style.width = sat + '%';
+            
+            const isWarm = r > b;
+            document.getElementById('val-temp').innerText = isWarm ? T["val-warm"] : T["val-cool"];
+            document.getElementById('bar-temp').style.width = isWarm ? "80%" : "20%";
+
+            // Links
+            const q = `${diagnosis.shot} ${diagnosis.angle}`;
+            document.getElementById('btnPinterest').href = `https://www.pinterest.co.kr/search/pins/?q=${q} photography`;
+            document.getElementById('btnBehance').href = `https://www.behance.net/search/projects?search=${q}`;
+            document.getElementById('btnGoogle').href = `https://www.google.com/search?tbm=isch&q=${q}`;
             
             document.querySelector('.ref-links').classList.add('visible');
             analysisCard.classList.add('visible');
         }
 
-        // 유틸
+        function updateAnalysisText(diagnosis) {
+            document.getElementById('badge-shot').innerText = diagnosis.shot;
+            document.getElementById('badge-angle').innerText = diagnosis.angle;
+            
+            const shotInfo = SHOT_DB[diagnosis.shot][currentLang] || SHOT_DB[diagnosis.shot]['en'];
+            const angleInfo = SHOT_DB[diagnosis.angle][currentLang] || SHOT_DB[diagnosis.angle]['en'];
+            
+            document.getElementById('shot-desc').innerHTML = 
+                `<strong>[${diagnosis.shot}]</strong>: ${shotInfo}<br><br>
+                 <strong>[${diagnosis.angle}]</strong>: ${angleInfo}`;
+        }
+
         function rgbToHex(r, g, b) {
             return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
         }
