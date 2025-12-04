@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panda Universe Pro Analyzer (V4.1)</title>
+    <title>Panda Universe Pro Analyzer (V5.0)</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
     
@@ -97,7 +97,7 @@
         }
         .btn:hover { opacity: 0.9; }
 
-        /* [핵심] 컬러 팔레트 */
+        /* 컬러 팔레트 */
         .palette-container {
             display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; 
             padding: 10px 0; perspective: 1000px; margin-top: -10px; 
@@ -116,7 +116,6 @@
         }
         .sphere:hover { transform: scale(1.15) rotate(15deg); }
         
-        /* 텍스트 정보 (Hex + %) */
         .color-info-box { text-align: center; }
         .hex-code { 
             font-family: monospace; font-size: 0.9rem; color: #fff; cursor: pointer; display: block; 
@@ -156,6 +155,29 @@
         .stat-value { font-size: 1rem; font-weight: bold; color: var(--text-main); }
         .stat-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; margin-top: 8px; overflow: hidden; }
         .stat-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
+
+        /* [NEW] 컬러 밸런스 섹션 */
+        .expert-box {
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .expert-title { font-size: 0.85rem; color: #00ccff; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .expert-text { font-size: 0.95rem; color: #eee; line-height: 1.6; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; }
+
+        /* [NEW] 히스토리 바 */
+        .history-bar {
+            width: 100%; max-width: 800px; margin-top: 20px; 
+            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0;
+            scrollbar-width: none; /* Firefox */
+        }
+        .history-bar::-webkit-scrollbar { display: none; } /* Chrome */
+        
+        .history-item {
+            min-width: 60px; height: 60px; border-radius: 12px; overflow: hidden;
+            border: 2px solid transparent; cursor: pointer; transition: all 0.2s; opacity: 0.6;
+            position: relative; flex-shrink: 0;
+        }
+        .history-item.active { border-color: var(--accent); opacity: 1; transform: scale(1.1); }
+        .history-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .ref-links { display: flex; justify-content: center; gap: 10px; margin-top: 10px; opacity: 0; transition: opacity 0.5s; flex-wrap: wrap;}
         .ref-links.visible { opacity: 1; }
@@ -249,7 +271,14 @@
                     <div class="stat-bar"><div class="stat-fill" id="bar-temp" style="background: linear-gradient(90deg, #4facfe 0%, #ff6b6b 100%);"></div></div>
                 </div>
             </div>
+
+            <div class="expert-box">
+                <span class="expert-title" data-i18n="expert-title">COLOR BALANCE & HARMONY</span>
+                <div class="expert-text" id="expert-desc">Analyzing color harmony...</div>
+            </div>
         </div>
+
+        <div id="historyBar" class="history-bar"></div>
 
         <div id="refLinks" class="ref-links">
             <a href="#" target="_blank" id="btnPinterest" class="ref-btn"><span>📌</span> <span data-i18n="ref-pin">Pinterest</span></a>
@@ -281,14 +310,14 @@
         };
 
         const TEXT_DB = {
-            en: { "title": "Panda Universe Pro", "subtitle": "AI Based Camera Shot & Angle Analyzer", "guide-paste": "Ctrl+V Paste", "guide-drag": "Drag & Drop", "guide-url": "URL Link", "drop-main": "to Paste", "drop-sub": "Drag & Drop / Click", "url-label": "Or paste image URL", "btn-analyze": "Analyze Image", "shot-title": "ANALYSIS RESULT", "stat-contrast": "Contrast", "stat-vibrancy": "Vibrancy", "stat-temp": "Temp", "ref-pin": "Pinterest", "ref-beh": "Behance", "ref-goog": "Google", "val-high": "High", "val-med": "Medium", "val-low": "Low", "val-vivid": "Vivid", "val-muted": "Muted", "val-warm": "Warm", "val-cool": "Cool" },
-            ko: { "title": "판다 유니버스 프로", "subtitle": "AI 기반 카메라 샷 & 앵글 분석기", "guide-paste": "Ctrl+V 붙여넣기", "guide-drag": "드래그 업로드", "guide-url": "URL 주소", "drop-main": "이미지 붙여넣기", "drop-sub": "드래그 또는 클릭", "url-label": "또는 이미지 URL", "btn-analyze": "이미지 분석", "shot-title": "분석 결과", "stat-contrast": "대비 (Contrast)", "stat-vibrancy": "생동감 (Vibrancy)", "stat-temp": "온도 (Temp)", "ref-pin": "핀터레스트", "ref-beh": "비핸스", "ref-goog": "구글", "val-high": "높음", "val-med": "중간", "val-low": "낮음", "val-vivid": "선명함", "val-muted": "차분함", "val-warm": "따뜻함", "val-cool": "차가움" },
-            jp: { "title": "パンダユニバースPro", "subtitle": "AIベースのカメラショット＆アングル分析", "guide-paste": "Ctrl+V 貼り付け", "guide-drag": "ドラッグ", "guide-url": "URL リンク", "drop-main": "貼り付け", "drop-sub": "ドラッグ または クリック", "url-label": "または画像URL", "btn-analyze": "画像分析", "shot-title": "分析結果", "stat-contrast": "コントラスト", "stat-vibrancy": "鮮やかさ", "stat-temp": "色温度", "ref-pin": "Pinterest", "ref-beh": "Behance", "ref-goog": "Google", "val-high": "高い", "val-med": "普通", "val-low": "低い", "val-vivid": "鮮やか", "val-muted": "落ち着いた", "val-warm": "暖かい", "val-cool": "冷たい" }
+            en: { "title": "Panda Universe Pro", "subtitle": "AI Based Camera Shot & Angle Analyzer", "guide-paste": "Ctrl+V Paste", "guide-drag": "Drag & Drop", "guide-url": "URL Link", "drop-main": "to Paste", "drop-sub": "Drag & Drop / Click", "url-label": "Or paste image URL", "btn-analyze": "Analyze Image", "shot-title": "ANALYSIS RESULT", "expert-title": "COLOR BALANCE & HARMONY", "stat-contrast": "Contrast", "stat-vibrancy": "Vibrancy", "stat-temp": "Temp", "ref-pin": "Pinterest", "ref-beh": "Behance", "ref-goog": "Google", "val-high": "High", "val-med": "Medium", "val-low": "Low", "val-vivid": "Vivid", "val-muted": "Muted", "val-warm": "Warm", "val-cool": "Cool" },
+            ko: { "title": "판다 유니버스 프로", "subtitle": "AI 기반 카메라 샷 & 앵글 분석기", "guide-paste": "Ctrl+V 붙여넣기", "guide-drag": "드래그 업로드", "guide-url": "URL 주소", "drop-main": "이미지 붙여넣기", "drop-sub": "드래그 또는 클릭", "url-label": "또는 이미지 URL", "btn-analyze": "이미지 분석", "shot-title": "분석 결과", "expert-title": "컬러 밸런스 & 하모니", "stat-contrast": "대비 (Contrast)", "stat-vibrancy": "생동감 (Vibrancy)", "stat-temp": "온도 (Temp)", "ref-pin": "핀터레스트", "ref-beh": "비핸스", "ref-goog": "구글", "val-high": "높음", "val-med": "중간", "val-low": "낮음", "val-vivid": "선명함", "val-muted": "차분함", "val-warm": "따뜻함", "val-cool": "차가움" },
+            jp: { "title": "パンダユニバースPro", "subtitle": "AIベースのカメラショット＆アングル分析", "guide-paste": "Ctrl+V 貼り付け", "guide-drag": "ドラッグ", "guide-url": "URL リンク", "drop-main": "貼り付け", "drop-sub": "ドラッグ または クリック", "url-label": "または画像URL", "btn-analyze": "画像分析", "shot-title": "分析結果", "expert-title": "カラーバランス＆ハーモニー", "stat-contrast": "コントラスト", "stat-vibrancy": "鮮やかさ", "stat-temp": "色温度", "ref-pin": "Pinterest", "ref-beh": "Behance", "ref-goog": "Google", "val-high": "高い", "val-med": "普通", "val-low": "低い", "val-vivid": "鮮やか", "val-muted": "落ち着いた", "val-warm": "暖かい", "val-cool": "冷たい" }
         };
 
         let currentLang = 'ko';
-        let lastDiagnosis = null;
         let colorThief;
+        let analysisHistory = []; // 히스토리 저장 배열
 
         // ==========================================
         // 2. 초기화 & 이벤트
@@ -302,6 +331,7 @@
         const analyzeBtn = document.getElementById('analyzeBtn');
         const dropMsg = document.querySelector('.drop-msg');
         const analysisCard = document.getElementById('analysisCard');
+        const historyBar = document.getElementById('historyBar');
         const toast = document.getElementById('toast');
 
         window.onload = () => {
@@ -319,7 +349,13 @@
                 if (TEXT_DB[lang][key]) el.innerHTML = TEXT_DB[lang][key];
             });
             urlInput.placeholder = lang === 'ko' ? "https://예시.com/이미지.jpg" : "https://example.com/image.jpg";
-            if(lastDiagnosis) updateAnalysisText(lastDiagnosis);
+            
+            // 현재 보고 있는 결과가 있다면 텍스트 갱신 (히스토리에서 불러온 데이터 활용)
+            if (previewImg.src && analysisCard.classList.contains('visible')) {
+               // 로직 재실행으로 텍스트 업데이트 (간편 방식)
+               // 실제 프로덕션에서는 데이터 바인딩을 권장하지만 여기선 재분석 호출
+               if (previewImg.complete) runFullAnalysis(false); // false = 히스토리 저장 안함
+            }
         }
 
         window.addEventListener('paste', (e) => {
@@ -343,6 +379,9 @@
         analyzeBtn.addEventListener('click', loadImageFromUrl);
         urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadImageFromUrl(); });
 
+        // ==========================================
+        // 3. 파일 처리 & 로딩
+        // ==========================================
         function processFile(file) {
             if (!file.type.startsWith('image/')) return;
             const reader = new FileReader();
@@ -350,7 +389,7 @@
                 previewImg.src = e.target.result;
                 previewImg.onload = () => {
                     previewImg.style.display = 'block'; dropMsg.style.display = 'none';
-                    runFullAnalysis();
+                    runFullAnalysis(true); // 새 분석 = 저장
                 };
             };
             reader.readAsDataURL(file);
@@ -366,7 +405,7 @@
             previewImg.onload = () => {
                 previewImg.style.display = 'block'; dropMsg.style.display = 'none';
                 analyzeBtn.innerText = TEXT_DB[currentLang]["btn-analyze"];
-                runFullAnalysis();
+                runFullAnalysis(true);
             };
             previewImg.onerror = () => {
                 analyzeBtn.innerText = TEXT_DB[currentLang]["btn-analyze"];
@@ -375,162 +414,171 @@
         }
 
         // ==========================================
-        // 3. 분석 로직 (V4.1)
+        // 4. 분석 알고리즘 (통합)
         // ==========================================
-        function runFullAnalysis() {
+        function runFullAnalysis(saveToHistory = false) {
             if (!colorThief) return;
             try {
-                // 1. 팔레트 추출
+                // 1. 데이터 추출
                 const palette = colorThief.getPalette(previewImg, 6, 10);
-                
-                // 2. 픽셀 분석 (구도 + 색상 분포)
                 const pixelStats = analyzePixels(previewImg);
-                
-                // 3. 색상 분포 비율 계산 (Color Count)
-                // 단순히 팔레트 순서가 아니라, 실제 픽셀과의 거리를 계산하여 정렬
                 const countedColors = getSortedColors(palette, pixelStats.counts);
-
-                // 4. 샷/앵글 진단
                 const diagnosis = diagnoseShotType(pixelStats);
-                lastDiagnosis = diagnosis;
+                const expertComment = generateExpertComment(countedColors, pixelStats);
 
-                // UI 업데이트
-                updateUI(countedColors, pixelStats, diagnosis);
+                // 2. UI 업데이트
+                updateUI(countedColors, pixelStats, diagnosis, expertComment);
+
+                // 3. 히스토리 저장 (새로운 이미지일 경우)
+                if (saveToHistory) {
+                    addToHistory({
+                        src: previewImg.src,
+                        colors: countedColors,
+                        stats: pixelStats,
+                        diagnosis: diagnosis,
+                        comment: expertComment
+                    });
+                }
 
             } catch (e) { console.error(e); }
         }
 
+        // 픽셀 분석 (기존 로직)
         function analyzePixels(img) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             const w = 120; const h = Math.floor(w * (img.naturalHeight / img.naturalWidth));
             canvas.width = w; canvas.height = h;
             ctx.drawImage(img, 0, 0, w, h);
-            
             const data = ctx.getImageData(0, 0, w, h).data;
+            
             let rTot=0, gTot=0, bTot=0;
-            let activePixelCount = 0; 
-            let verticalMass = 0;
-            let totalEnergy = 0;
-            const counts = {}; // 색상 카운팅용
+            let verticalMass=0, totalEnergy=0;
+            const counts={};
 
             for (let y=0; y<h; y++) {
                 for (let x=0; x<w; x++) {
                     const i = (y*w + x)*4;
                     const r=data[i], g=data[i+1], b=data[i+2];
                     
-                    // 색상 카운팅 (간소화)
-                    if (x % 2 === 0 && y % 2 === 0) { // 성능 위해 샘플링
-                         counts[`${r},${g},${b}`] = (counts[`${r},${g},${b}`] || 0) + 1;
-                    }
+                    // 색상 카운팅 (샘플링)
+                    if (x%2===0 && y%2===0) counts[`${r},${g},${b}`] = (counts[`${r},${g},${b}`] || 0) + 1;
                     
                     rTot+=r; gTot+=g; bTot+=b;
 
-                    // 엣지 계산 (앵글용)
-                    if (x < w-1) {
-                        const i2 = (y*w + (x+1))*4;
-                        const lum1 = (r+g+b)/3;
-                        const lum2 = (data[i2]+data[i2+1]+data[i2+2])/3;
-                        const diff = Math.abs(lum1 - lum2);
-                        if (diff > 15) {
-                            verticalMass += y; 
-                            totalEnergy++;
-                        }
+                    // 엣지(앵글용)
+                    if (x<w-1) {
+                        const i2=(y*w+(x+1))*4;
+                        const l1=(r+g+b)/3; const l2=(data[i2]+data[i2+1]+data[i2+2])/3;
+                        if(Math.abs(l1-l2)>15) { verticalMass+=y; totalEnergy++; }
                     }
                 }
             }
-            
             const vCenter = totalEnergy > 0 ? (verticalMass / totalEnergy) / h : 0.5;
             const activeRatio = totalEnergy / (w*h);
-
-            return {
-                avgColor: [Math.round(rTot/(w*h)), Math.round(gTot/(w*h)), Math.round(bTot/(w*h))],
-                vCenter: vCenter,
-                activeRatio: activeRatio,
-                counts: counts
-            };
+            return { avgColor:[rTot/(w*h), gTot/(w*h), bTot/(w*h)], vCenter, activeRatio, counts };
         }
 
         function getSortedColors(palette, counts) {
-            const threshold = 45; // 색상 유사도 범위
+            const threshold = 45;
             return palette.map(color => {
                 let count = 0;
                 for (const key in counts) {
-                    const [r, g, b] = key.split(',').map(Number);
-                    // 유클리드 거리
-                    const dist = Math.sqrt(Math.pow(r - color[0], 2) + Math.pow(g - color[1], 2) + Math.pow(b - color[2], 2));
-                    if (dist < threshold) count += counts[key];
+                    const [r,g,b] = key.split(',').map(Number);
+                    if (Math.sqrt(Math.pow(r-color[0],2)+Math.pow(g-color[1],2)+Math.pow(b-color[2],2)) < threshold) count += counts[key];
                 }
                 return { color, count, hex: rgbToHex(color[0], color[1], color[2]) };
-            })
-            .sort((a, b) => b.count - a.count); // 카운트 높은 순 정렬
+            }).sort((a,b)=>b.count-a.count);
         }
 
         function diagnoseShotType(stats) {
             let angle = "Eye Level";
-            if (stats.vCenter < 0.42) angle = "High Angle";
-            else if (stats.vCenter > 0.58) angle = "Low Angle";
-            
+            if (stats.vCenter < 0.42) angle = "High Angle"; else if (stats.vCenter > 0.58) angle = "Low Angle";
             let shot = "Medium Shot";
-            if (stats.activeRatio > 0.35) shot = "Close Up";
-            else if (stats.activeRatio > 0.15) shot = "Medium Shot";
-            else shot = "Long Shot";
-
-            if (stats.activeRatio > 0.6) shot = "Extreme Close Up";
-            if (stats.activeRatio < 0.05) shot = "Extreme Long Shot";
-
+            if (stats.activeRatio > 0.35) shot = "Close Up"; else if (stats.activeRatio > 0.15) shot = "Medium Shot"; else shot = "Long Shot";
+            if (stats.activeRatio > 0.6) shot = "Extreme Close Up"; if (stats.activeRatio < 0.05) shot = "Extreme Long Shot";
             return { shot, angle };
         }
 
-        function updateUI(colors, stats, diagnosis) {
-            // 배경
+        // [NEW] 전문가 코멘트 생성기 (컬러 밸런스)
+        function generateExpertComment(colors, stats) {
+            const main = colors[0].color; // 주조색
+            const sub = colors[1] ? colors[1].color : main; // 보조색
+            
+            // 1. 색 온도 분석
+            const [r, g, b] = stats.avgColor;
+            const isWarm = r > b;
+            
+            // 2. 대비 분석 (보색 관계 등)
+            // 간단하게 RGB 차이로 대비감 계산
+            const colorDist = Math.sqrt(Math.pow(main[0]-sub[0],2) + Math.pow(main[1]-sub[1],2) + Math.pow(main[2]-sub[2],2));
+            const isHighContrast = colorDist > 100;
+
+            // 3. 언어별 코멘트 생성
+            if (currentLang === 'ko') {
+                let mood = isWarm ? "따뜻하고 활기찬" : "차분하고 세련된";
+                let contrast = isHighContrast ? "강렬한 색상 대비(High Contrast)를 통해 피사체를 명확히 분리하고 시선을 집중시키고 있습니다." 
+                                              : "유사한 톤(Analogous)의 배색으로 부드럽고 조화로운 통일감을 주고 있습니다.";
+                return `전체적으로 <strong>${mood} 톤</strong>이 지배적이며, ${contrast} <br>주조색(${colors[0].hex})이 전체 무드를 리드하는 가운데 보조색이 시각적 밸런스를 맞추고 있습니다.`;
+            } else if (currentLang === 'jp') {
+                let mood = isWarm ? "温かく活気のある" : "落ち着いた洗練された";
+                let contrast = isHighContrast ? "強い色のコントラストにより、被写体を明確にし、視線を集めています。" 
+                                              : "類似色（Analogous）の配色で、柔らかく調和のとれた統一感を与えています。";
+                return `全体的に<strong>${mood}トーン</strong>が支配的で、${contrast}`;
+            } else {
+                let mood = isWarm ? "warm and vibrant" : "cool and sophisticated";
+                let contrast = isHighContrast ? "creates visual tension through high contrast, effectively isolating the subject." 
+                                              : "offers a harmonious look with an analogous color scheme.";
+                return `The overall mood is <strong>${mood}</strong>. The palette ${contrast}`;
+            }
+        }
+
+        // ==========================================
+        // 5. UI 업데이트 & 히스토리
+        // ==========================================
+        function updateUI(colors, stats, diagnosis, expertComment) {
             const main = colors[0].color;
             ambientBg.style.background = `radial-gradient(circle at 50% 50%, rgb(${main[0]},${main[1]},${main[2]}), #000)`;
 
-            // [핵심] 팔레트 렌더링 (퍼센트 포함)
+            // 팔레트
             const area = document.getElementById('paletteArea');
             area.innerHTML = '';
-            
-            // 전체 픽셀 수 (비율 계산용)
             const totalCount = colors.reduce((acc, cur) => acc + cur.count, 0);
-
             colors.forEach((item, i) => {
-                // 비율 계산
                 const percent = totalCount > 0 ? ((item.count / totalCount) * 100).toFixed(1) : 0;
-                
                 const el = document.createElement('div');
                 el.className = 'color-item';
                 el.style.animationDelay = i*0.1 + 's';
-                el.innerHTML = `
-                    <div class="sphere" style="background-color:rgb(${item.color[0]},${item.color[1]},${item.color[2]})" onclick="copy('${item.hex}')"></div>
-                    <div class="color-info-box">
-                        <span class="hex-code" onclick="copy('${item.hex}')">${item.hex}</span>
-                        <span class="percent-text">${percent}%</span>
-                    </div>
-                `;
+                el.innerHTML = `<div class="sphere" style="background-color:rgb(${item.color.join(',')})" onclick="copy('${item.hex}')"></div>
+                                <div class="color-info-box"><span class="hex-code" onclick="copy('${item.hex}')">${item.hex}</span><span class="percent-text">${percent}%</span></div>`;
                 area.appendChild(el);
             });
 
-            // 텍스트 업데이트
-            updateAnalysisText(diagnosis);
-            
-            // 수치 업데이트
+            // 뱃지 및 설명
+            document.getElementById('badge-shot').innerText = diagnosis.shot;
+            document.getElementById('badge-angle').innerText = diagnosis.angle;
+            const shotInfo = SHOT_DB[diagnosis.shot][currentLang] || SHOT_DB[diagnosis.shot]['en'];
+            const angleInfo = SHOT_DB[diagnosis.angle][currentLang] || SHOT_DB[diagnosis.angle]['en'];
+            document.getElementById('shot-desc').innerHTML = `<strong>[${diagnosis.shot}]</strong>: ${shotInfo}<br><strong>[${diagnosis.angle}]</strong>: ${angleInfo}`;
+
+            // 전문가 코멘트
+            document.getElementById('expert-desc').innerHTML = expertComment;
+
+            // 수치
             const T = TEXT_DB[currentLang];
             const [r,g,b] = stats.avgColor;
             const max = Math.max(r,g,b), min = Math.min(r,g,b);
-            const sat = max===0 ? 0 : (max-min)/max * 100;
-            
+            const sat = max===0?0:(max-min)/max * 100;
+            const isWarm = r > b;
+
             document.getElementById('val-contrast').innerText = stats.activeRatio > 0.2 ? T["val-high"] : T["val-low"];
             document.getElementById('bar-contrast').style.width = Math.min(100, stats.activeRatio*300) + '%';
-            
             document.getElementById('val-vibrancy').innerText = sat > 40 ? T["val-vivid"] : T["val-muted"];
             document.getElementById('bar-vibrancy').style.width = sat + '%';
-            
-            const isWarm = r > b;
             document.getElementById('val-temp').innerText = isWarm ? T["val-warm"] : T["val-cool"];
             document.getElementById('bar-temp').style.width = isWarm ? "80%" : "20%";
 
-            // Links
+            // 링크
             const q = `${diagnosis.shot} ${diagnosis.angle}`;
             document.getElementById('btnPinterest').href = `https://www.pinterest.co.kr/search/pins/?q=${q} photography`;
             document.getElementById('btnBehance').href = `https://www.behance.net/search/projects?search=${q}`;
@@ -540,16 +588,47 @@
             analysisCard.classList.add('visible');
         }
 
-        function updateAnalysisText(diagnosis) {
-            document.getElementById('badge-shot').innerText = diagnosis.shot;
-            document.getElementById('badge-angle').innerText = diagnosis.angle;
+        // [NEW] 히스토리 기능
+        function addToHistory(data) {
+            // 중복 방지 (가장 최근 것과 같으면 패스)
+            if (analysisHistory.length > 0 && analysisHistory[0].src === data.src) return;
             
-            const shotInfo = SHOT_DB[diagnosis.shot][currentLang] || SHOT_DB[diagnosis.shot]['en'];
-            const angleInfo = SHOT_DB[diagnosis.angle][currentLang] || SHOT_DB[diagnosis.angle]['en'];
+            // 최대 10개까지만 저장
+            if (analysisHistory.length >= 10) analysisHistory.pop();
+            analysisHistory.unshift(data);
             
-            document.getElementById('shot-desc').innerHTML = 
-                `<strong>[${diagnosis.shot}]</strong>: ${shotInfo}<br><br>
-                 <strong>[${diagnosis.angle}]</strong>: ${angleInfo}`;
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyBar.innerHTML = '';
+            analysisHistory.forEach((item, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'history-item';
+                if (index === 0) thumb.classList.add('active'); // 현재 보고있는 것
+                
+                const img = document.createElement('img');
+                img.src = item.src;
+                
+                thumb.appendChild(img);
+                thumb.onclick = () => restoreAnalysis(index);
+                historyBar.appendChild(thumb);
+            });
+        }
+
+        function restoreAnalysis(index) {
+            const data = analysisHistory[index];
+            previewImg.src = data.src;
+            previewImg.style.display = 'block';
+            dropMsg.style.display = 'none';
+            
+            // 저장된 데이터로 UI 즉시 복구 (재계산 X)
+            updateUI(data.colors, data.stats, data.diagnosis, data.comment);
+            
+            // 히스토리 스타일 업데이트
+            document.querySelectorAll('.history-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
         }
 
         function rgbToHex(r, g, b) {
